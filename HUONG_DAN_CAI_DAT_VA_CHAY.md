@@ -149,3 +149,8 @@ Không dùng migrations SQL Server trong LegacySqlServer với SQLite. Các migr
 đổi đuôi .cs.txt để không biên dịch. EnsureCreated không cập nhật schema đã tồn tại.
 Khi thay đổi Models về sau, cần lập bộ migrations SQLite mới và phương án giữ dữ liệu.
 Không xóa file .db có dữ liệu cần giữ. Dừng ứng dụng trước khi sao lưu database.
+
+## 8. Deploy Docker / Render
+
+Đã thêm Dockerfile, .dockerignore và cấu hình lưu khóa đăng nhập/health check.
+Xem DEPLOY_RENDER.md để cấu hình Docker Web Service, PORT và Persistent Disk.

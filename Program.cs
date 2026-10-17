@@ -1,9 +1,21 @@
 using LTW09.Data;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Khi chạy Docker/Render, giữ khóa cookie/anti-forgery trên cùng persistent disk với SQLite.
+var dataProtectionKeysPath = Environment.GetEnvironmentVariable("DATA_PROTECTION_KEYS_PATH");
+if (!string.IsNullOrWhiteSpace(dataProtectionKeysPath))
+{
+    var keysDirectory = new DirectoryInfo(Path.GetFullPath(dataProtectionKeysPath, builder.Environment.ContentRootPath));
+    keysDirectory.Create();
+    builder.Services.AddDataProtection()
+        .SetApplicationName("LTW09")
+        .PersistKeysToFileSystem(keysDirectory);
+}
 
 var connectionString = builder.Configuration.GetConnectionString("FlowerShop")
     ?? throw new InvalidOperationException("Thiếu connection string 'FlowerShop'.");
@@ -71,7 +83,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    // Health probe nội bộ của Render dùng HTTP; các trang người dùng vẫn chuyển HTTPS.
+    app.UseWhen(context => context.Request.Path != "/healthz", branch => branch.UseHttpsRedirection());
+}
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
@@ -81,5 +97,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+// Startup đã hoàn tất khởi tạo SQLite trước khi server nhận health check.
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 
 app.Run();

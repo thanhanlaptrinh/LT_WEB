@@ -3,3 +3,6 @@ obj/
 .vs/
 App_Data/*.db
 App_Data/*.db-*
+App_Data/keys/
+.env
+.env.*
