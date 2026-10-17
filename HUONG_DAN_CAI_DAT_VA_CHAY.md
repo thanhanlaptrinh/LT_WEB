@@ -150,7 +150,15 @@ Không dùng migrations SQL Server trong LegacySqlServer với SQLite. Các migr
 Khi thay đổi Models về sau, cần lập bộ migrations SQLite mới và phương án giữ dữ liệu.
 Không xóa file .db có dữ liệu cần giữ. Dừng ứng dụng trước khi sao lưu database.
 
-## 8. Deploy Docker / Render
 
-Đã thêm Dockerfile, .dockerignore và cấu hình lưu khóa đăng nhập/health check.
-Xem DEPLOY_RENDER.md để cấu hình Docker Web Service, PORT và Persistent Disk.
+## Bổ sung Docker / Render trên bản đã chỉnh sửa
+
+Bản này giữ các sửa đổi của file ZIP vừa gửi, gồm phần tải lại đánh giá và seed thêm
+22 sản phẩm cùng 22 ảnh. Chỉ ghép cấu hình deploy: Dockerfile, .dockerignore,
+DEPLOY_RENDER.md, cấu hình lưu khóa đăng nhập và endpoint /healthz trong Program.cs.
+
+Xem DEPLOY_RENDER.md để tạo Docker Web Service. Đặt Root Directory là thư mục có
+LTW09.csproj và Dockerfile; Dockerfile Path ./Dockerfile; Docker Command để trống;
+Health Check Path /healthz. Cổng tự đọc từ PORT do Render cấp.
+Giữ dữ liệu SQLite qua restart/redeploy bằng Persistent Disk tại /app/App_Data.
+Không xóa database hiện có khi cập nhật code.

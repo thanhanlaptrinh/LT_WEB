@@ -208,7 +208,7 @@
     try {
       const result = await requestJson(`/Products/Review/${id}`, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
       if (id !== productId || !detailDialog.open) return;
-      starFilter = 0; reviewPage = 1; await loadDetails();
+      starFilter = 0; reviewPage = 1; await loadDetails({ initial: true });
       if (id === productId && detailDialog.open) byId('review-feedback').textContent = result.message;
     } catch (error) { if (id === productId) byId('review-feedback').textContent = error.message; }
     finally { submit.disabled = false; }

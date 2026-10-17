@@ -500,5 +500,131 @@ public static class DbSeeder
                 await db.SaveChangesAsync();
             }
         }
+
+        // Seed thêm 22 sản phẩm mới (chỉ insert nếu chưa có theo Slug)
+        await SeedNewProductsAsync(db);
+    }
+
+    private static async Task SeedNewProductsAsync(FlowerShopDbContext db)
+    {
+        var catBouquet = await db.Categories.FirstOrDefaultAsync(c => c.Slug == "bouquet");
+        var catBox = await db.Categories.FirstOrDefaultAsync(c => c.Slug == "flower-box");
+        var catSeasonal = await db.Categories.FirstOrDefaultAsync(c => c.Slug == "seasonal") ?? catBouquet;
+        if (catBouquet == null || catBox == null) return; // Categories chưa được tạo
+
+        // Danh sách sản phẩm mới cần seed (slug -> dữ liệu)
+        var newProducts = new[]
+        {
+            new { CategoryId = catBouquet.CategoryId, Name = "Sắc Hồng Mùa Xuân", Slug = "sac-hong-mua-xuan",
+                  Description = "Hồng Ecuador phối lá bạc, gói giấy craft tự nhiên.", Label = "Được yêu thích",
+                  Price = 780000m, Stock = 10, Image = "/assets/sac-hong-mua-xuan.jpg", Featured = false },
+            new { CategoryId = catBouquet.CategoryId, Name = "Gửi Em Ngàn Sao", Slug = "gui-em-ngan-sao",
+                  Description = "Hồng đỏ và baby trắng, thông điệp tình yêu ngập tràn.", Label = "Bán chạy",
+                  Price = 850000m, Stock = 7, Image = "/assets/gui-em-ngan-sao.jpg", Featured = true },
+            new { CategoryId = catSeasonal!.CategoryId, Name = "Nắng Vàng Trong Veo", Slug = "nang-vang-trong-veo",
+                  Description = "Hoa đồng tiền vàng phối cúc tana, sắc hè tươi sáng.", Label = "Hoa theo mùa",
+                  Price = 520000m, Stock = 11, Image = "/assets/nang-vang-trong-veo.jpg", Featured = false },
+            new { CategoryId = catBouquet.CategoryId, Name = "Hồng Phai Mộng Mơ", Slug = "hong-phai-mong-mo",
+                  Description = "Hồng pastel phối cẩm chướng, nhẹ nhàng và tinh tế.", Label = "Mới",
+                  Price = 690000m, Stock = 8, Image = "/assets/hong-phai-mong-mo.jpg", Featured = false },
+            new { CategoryId = catBox.CategoryId, Name = "Hộp Hoa Thanh Xuân", Slug = "hop-hoa-thanh-xuan",
+                  Description = "Hộp hoa hồng kem phối lá xanh, thiết kế sang trọng.", Label = "Thiết kế riêng",
+                  Price = 980000m, Stock = 5, Image = "/assets/hop-hoa-thanh-xuan.jpg", Featured = true },
+            new { CategoryId = catBox.CategoryId, Name = "Mùa Thương Gửi Em", Slug = "mua-thuong-gui-em",
+                  Description = "Hồng phấn và cát tường trong hộp quà tinh tế.", Label = "Gói thủ công",
+                  Price = 920000m, Stock = 6, Image = "/assets/mua-thuong-gui-em.jpg", Featured = false },
+            new { CategoryId = catSeasonal.CategoryId, Name = "Thoảng Hương Tinh Khôi", Slug = "thoang-huong-tinh-khoi",
+                  Description = "Hoa cúc trắng theo mùa, tinh khôi và thanh lịch.", Label = "Hoa theo mùa",
+                  Price = 430000m, Stock = 13, Image = "/assets/thoang-huong-tinh-khoi.jpg", Featured = false },
+            new { CategoryId = catBouquet.CategoryId, Name = "Ban Mai Dịu Êm", Slug = "ban-mai-diu-em",
+                  Description = "Tulip hồng phối cúc nhỏ, gợi cảm giác bình yên buổi sáng.", Label = "Mới",
+                  Price = 760000m, Stock = 9, Image = "/assets/ban-mai-diu-em.jpg", Featured = false },
+            new { CategoryId = catBouquet.CategoryId, Name = "Lời Thương Ngọt Ngào", Slug = "loi-thuong-ngot-ngao",
+                  Description = "Hồng kem phối hoa baby, nhẹ nhàng như lời thì thầm.", Label = "Được yêu thích",
+                  Price = 640000m, Stock = 12, Image = "/assets/loi-thuong-ngot-ngao.jpg", Featured = false },
+            new { CategoryId = catSeasonal.CategoryId, Name = "Gió Hè Bên Em", Slug = "gio-he-ben-em",
+                  Description = "Hoa phối sắc vàng và cam, hương sắc mùa hè rực rỡ.", Label = "Hoa theo mùa",
+                  Price = 560000m, Stock = 10, Image = "/assets/gio-he-ben-em.jpg", Featured = false },
+            new { CategoryId = catBox.CategoryId, Name = "Vòng Tay Yêu Thương", Slug = "vong-tay-yeu-thuong",
+                  Description = "Hồng đỏ trong hộp quà sang trọng, trao gửi yêu thương.", Label = "Bán chạy",
+                  Price = 1150000m, Stock = 4, Image = "/assets/vong-tay-yeu-thuong.jpg", Featured = true },
+            new { CategoryId = catBouquet.CategoryId, Name = "Hồng Chạm Nhẹ Nhàng", Slug = "hong-cham-nhe-nhang",
+                  Description = "Hồng phấn phối lá eucalyptus, dịu dàng và thơm mát.", Label = "Gói thủ công",
+                  Price = 730000m, Stock = 8, Image = "/assets/hong-cham-nhe-nhang.jpg", Featured = false },
+            new { CategoryId = catBouquet.CategoryId, Name = "Hoa Cưới An Yên", Slug = "hoa-cuoi-an-yen",
+                  Description = "Hoa trắng xanh thanh lịch, hoàn hảo cho ngày trọng đại.", Label = "Thiết kế riêng",
+                  Price = 1250000m, Stock = 3, Image = "/assets/hoa-cuoi-an-yen.jpg", Featured = true },
+            new { CategoryId = catBox.CategoryId, Name = "Hộp Hoa Chúc Mừng", Slug = "hop-hoa-chuc-mung",
+                  Description = "Hoa phối màu tươi sáng trong hộp, mang niềm vui đến mọi dịp.", Label = "Chúc mừng",
+                  Price = 890000m, Stock = 6, Image = "/assets/hop-hoa-chuc-mung.jpg", Featured = false },
+            new { CategoryId = catSeasonal.CategoryId, Name = "Sắc Màu Hạnh Phúc", Slug = "sac-mau-hanh-phuc",
+                  Description = "Hoa đồng tiền và cúc nhiều màu, rực rỡ và tươi vui.", Label = "Hoa theo mùa",
+                  Price = 490000m, Stock = 14, Image = "/assets/sac-mau-hanh-phuc.jpg", Featured = false },
+            new { CategoryId = catBouquet.CategoryId, Name = "Tình Yêu Đầu", Slug = "tinh-yeu-dau",
+                  Description = "Tulip đỏ hồng gói giấy kraft, ký ức ngọt ngào tình yêu đầu.", Label = "Bán chạy",
+                  Price = 960000m, Stock = 5, Image = "/assets/tinh-yeu-dau.jpg", Featured = true },
+            new { CategoryId = catBouquet.CategoryId, Name = "Bản Tình Ca Hồng", Slug = "ban-tinh-ca-hong",
+                  Description = "Hồng garden phối cát tường, bản tình ca bất tận.", Label = "Được yêu thích",
+                  Price = 880000m, Stock = 7, Image = "/assets/ban-tinh-ca-hong.jpg", Featured = false },
+            new { CategoryId = catSeasonal.CategoryId, Name = "Tháng Năm Rực Rỡ", Slug = "thang-nam-ruc-ro",
+                  Description = "Hoa mùa hè sắc vàng cam, rực rỡ như tháng năm tuổi trẻ.", Label = "Hoa theo mùa",
+                  Price = 510000m, Stock = 10, Image = "/assets/thang-nam-ruc-ro.jpg", Featured = false },
+            new { CategoryId = catBox.CategoryId, Name = "Nắng Ôm Mùa Hoa", Slug = "nang-om-mua-hoa",
+                  Description = "Hồng vàng phối cẩm tú cầu, ấm áp như nắng ban mai.", Label = "Mới",
+                  Price = 1050000m, Stock = 4, Image = "/assets/nang-om-mua-hoa.jpg", Featured = true },
+            new { CategoryId = catBouquet.CategoryId, Name = "Gửi Người Thương", Slug = "gui-nguoi-thuong",
+                  Description = "Hoa trắng xanh gói giấy tự nhiên, gửi trọn yêu thương.", Label = "Gói thủ công",
+                  Price = 790000m, Stock = 8, Image = "/assets/gui-nguoi-thuong.jpg", Featured = false },
+            new { CategoryId = catSeasonal.CategoryId, Name = "Điều Ước Bình Yên", Slug = "dieu-uoc-binh-yen",
+                  Description = "Hoa cúc trắng và lá xanh, điều ước về cuộc sống bình yên.", Label = "Hoa theo mùa",
+                  Price = 470000m, Stock = 12, Image = "/assets/dieu-uoc-binh-yen.jpg", Featured = false },
+            new { CategoryId = catBox.CategoryId, Name = "Hộp Hoa Lung Linh", Slug = "hop-hoa-lung-linh",
+                  Description = "Hồng pastel và hoa điểm nhỏ, lung linh như giấc mơ.", Label = "Thiết kế riêng",
+                  Price = 990000m, Stock = 5, Image = "/assets/hop-hoa-lung-linh.jpg", Featured = false },
+        };
+
+        var toInsert = new List<Product>();
+        foreach (var np in newProducts)
+        {
+            // Chỉ insert nếu chưa có sản phẩm với slug này
+            if (!await db.Products.AnyAsync(p => p.Slug == np.Slug))
+            {
+                toInsert.Add(new Product
+                {
+                    CategoryId = np.CategoryId,
+                    Name = np.Name,
+                    Slug = np.Slug,
+                    Description = np.Description,
+                    Label = np.Label,
+                    Price = np.Price,
+                    StockQuantity = np.Stock,
+                    ImageUrl = np.Image,
+                    IsActive = true,
+                    IsFeatured = np.Featured,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        if (toInsert.Count > 0)
+        {
+            db.Products.AddRange(toInsert);
+            await db.SaveChangesAsync();
+
+            // Thêm lịch sử nhập kho cho sản phẩm mới
+            foreach (var p in toInsert)
+            {
+                db.InventoryMovements.Add(new InventoryMovement
+                {
+                    ProductId = p.ProductId,
+                    QuantityChange = p.StockQuantity,
+                    MovementType = "Initial",
+                    ReferenceCode = "SEED-NEW",
+                    Note = "Tồn kho ban đầu — sản phẩm bổ sung",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await db.SaveChangesAsync();
+        }
     }
 }
