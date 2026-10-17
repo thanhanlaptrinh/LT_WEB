@@ -1,0 +1,130 @@
+@model IEnumerable<LTW09.Models.ShopOrder>
+@{
+    ViewData["Title"] = "Đơn hàng của tôi — Lá & Nụ";
+    var userEmail = ViewBag.UserEmail as string ?? "";
+
+    string GetStatusName(string s) => s switch {
+        "Pending"   => "Chờ xác nhận",
+        "Confirmed" => "Đã xác nhận",
+        "Preparing" => "Đang cắm hoa",
+        "Shipping"  => "Đang giao hàng",
+        "Completed" => "Đã hoàn tất",
+        "Cancelled" => "Đã hủy",
+        _           => s
+    };
+
+    string GetBadgeClass(string s) => s switch {
+        "Pending"   => "stock-low",
+        "Confirmed" => "stock-preorder",
+        "Preparing" => "stock-preorder",
+        "Shipping"  => "stock-bestseller",
+        "Completed" => "stock-in",
+        "Cancelled" => "text-danger",
+        _           => "stock-low"
+    };
+}
+
+<section class="section" style="background:var(--paper);min-height:75vh;padding-top:4rem;">
+    <div class="container" style="max-width:960px;">
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-2 border-bottom">
+            <div>
+                <p class="section-label">TÀI KHOẢN KHÁCH HÀNG</p>
+                <h1 style="font-size:2.2rem;margin:0;">Lịch sử đơn hoa của bạn</h1>
+                <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;">
+                    Tài khoản: <strong>@userEmail</strong>
+                </p>
+            </div>
+            <a href="/Home/New" class="btn btn-petal" style="font-size:.76rem;">
+                + Đặt thêm hoa tươi
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5 bg-white border">
+                <span style="font-size:3rem;color:var(--muted);display:block;margin-bottom:.8rem;">✿</span>
+                <h3 style="font-size:1.3rem;margin-bottom:.4rem;">Bạn chưa có đơn đặt hoa nào</h3>
+                <p style="font-size:.84rem;color:var(--muted);margin-bottom:1.5rem;">
+                    Hãy chọn một bó hoa thật xinh xắn để gửi trao yêu thương đến những người trân quý nhé.
+                </p>
+                <a href="/Home/New" class="btn btn-petal">Khám phá bộ sưu tập hoa mới ↗</a>
+            </div>
+        }
+        else
+        {
+            <div class="d-grid gap-3">
+                @foreach (var order in Model)
+                {
+                    <div class="card p-3 p-md-4 border shadow-sm" style="border-radius:0;background:#fff;">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3 pb-2 border-bottom">
+                            <div>
+                                <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">MÃ ĐƠN HÀNG</span>
+                                <div style="font-size:1.15rem;font-weight:700;color:var(--leaf);font-family:'Playfair Display',serif;">
+                                    @order.OrderCode
+                                </div>
+                                <span style="font-size:.72rem;color:var(--muted);">
+                                    Đặt lúc: @order.CreatedAt.ToString("HH:mm - dd/MM/yyyy")
+                                </span>
+                            </div>
+
+                            <div class="text-end">
+                                <span class="stock-badge @GetBadgeClass(order.Status) mb-1">
+                                    ● @GetStatusName(order.Status)
+                                </span>
+                                <div style="font-size:1.1rem;font-weight:700;color:var(--ink);">
+                                    @order.TotalAmount.ToString("N0") ₫
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3" style="font-size:.82rem;">
+                            <div class="col-sm-6">
+                                <strong>Người nhận:</strong> @order.RecipientName (@order.RecipientPhone)
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Ngày giao:</strong> @(order.DeliveryDate.HasValue ? order.DeliveryDate.Value.ToString("dd/MM/yyyy") : "Giao sớm nhất")
+                            </div>
+                            <div class="col-12">
+                                <strong>Địa chỉ giao:</strong> @order.DeliveryAddress
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(order.CardMessage))
+                            {
+                                <div class="col-12" style="color:var(--rose);font-style:italic;">
+                                    <strong>Thiệp mừng:</strong> “@order.CardMessage”
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Danh sách hoa tóm tắt -->
+                        <div class="p-2 mb-3 bg-light" style="font-size:.8rem;">
+                            @foreach (var item in order.Items)
+                            {
+                                <div class="d-flex justify-content-between align-items-center py-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" alt="" style="width:36px;height:40px;object-fit:cover;" />
+                                        }
+                                        <span><strong>@item.ProductName</strong> × @item.Quantity</span>
+                                    </div>
+                                    <span>@item.LineTotal.ToString("N0") ₫</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <form method="post" asp-action="Lookup" asp-controller="Orders" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="orderCode" value="@order.OrderCode" />
+                                <input type="hidden" name="phone" value="@order.RecipientPhone" />
+                                <button type="submit" class="btn btn-sm btn-outline-dark" style="border-radius:0;font-size:.72rem;">
+                                    Xem tiến trình giao hàng 🔍
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

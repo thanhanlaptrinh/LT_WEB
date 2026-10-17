@@ -1,0 +1,35 @@
+@model IEnumerable<LTW09.Models.Product>
+@{ var items = Model.ToList(); }
+<section class="collection-banner" id="bestseller-banner" aria-label="Bộ sưu tập hoa bán chạy" aria-roledescription="trình chiếu">
+    <div class="container">
+        <div class="banner-viewport">
+            <div class="banner-track" id="banner-track">
+                @for (var i = 0; i < items.Count; i++)
+                {
+                    var p = items[i];
+                    <article class="banner-slide" data-banner-product="@p.ProductId" aria-label="@(i + 1) / @items.Count" aria-hidden="@(i != 0 ? "true" : "false")">
+                        <div class="banner-copy">
+                            <p class="section-label">BỘ SƯU TẬP · HOA BÁN CHẠY</p>
+                            <h1>@p.Name</h1>
+                            <p class="banner-description">@p.Description</p>
+                            <p class="banner-price">@p.Price.ToString("N0") ₫</p>
+                            <button type="button" class="btn btn-petal" data-product-open="@p.ProductId">Khám phá mẫu hoa →</button>
+                        </div>
+                        <div class="banner-photo"><img src="@p.ImageUrl" alt="@p.Name" fetchpriority="@(i == 0 ? "high" : "auto")" /></div>
+                    </article>
+                }
+            </div>
+            <div id="banner-empty" class="banner-empty" hidden="@(items.Count > 0)">
+                <p class="section-label">BỘ SƯU TẬP & SỰ KIỆN</p><h1>Hoa tươi, gửi trọn yêu thương.</h1>
+                <p>Các mẫu hoa bán chạy đang được cập nhật. Khám phá bộ sưu tập bên dưới nhé.</p>
+            </div>
+        </div>
+        <div class="banner-controls" hidden="@(items.Count < 2)">
+            <div class="banner-arrows"><button type="button" data-banner-prev aria-label="Mẫu hoa trước">←</button>
+                <button type="button" data-banner-next aria-label="Mẫu hoa tiếp theo">→</button></div>
+            <div class="banner-dots" id="banner-dots" aria-label="Chọn mẫu hoa"></div>
+            <button type="button" data-banner-pause aria-pressed="false">Tạm dừng</button>
+        </div>
+        <p class="visually-hidden" id="banner-status" aria-live="polite"></p>
+    </div>
+</section>

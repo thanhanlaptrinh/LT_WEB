@@ -1,0 +1,904 @@
+@model LTW09.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Đặt hoa theo bước — Tiệm hoa Lá & Nụ";
+    var todayStr = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<section class="section" style="background:var(--paper);min-height:75vh;padding-top:3.5rem;">
+    <div class="container" style="max-width:780px;">
+        <div class="text-center mb-3">
+            <p class="section-label">ĐẶT HOA TRỰC TUYẾN</p>
+            <h1 style="font-size:clamp(1.9rem,4vw,2.6rem);margin:.2rem 0 .4rem;">
+                Quy trình đặt hoa
+            </h1>
+            <p style="font-size:.82rem;color:var(--muted);margin:0;">
+                Hoàn tất 5 bước đơn giản để Lá & Nụ chuẩn bị và trao gửi bó hoa tươi thắm đến người thương.
+            </p>
+        </div>
+
+        <!-- 5-Step Stepper Header -->
+        <div class="checkout-stepper" id="checkout-stepper" role="tablist">
+            <div class="step-item active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-title">Giỏ hoa</div>
+            </div>
+            <div class="step-item" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-title">Người nhận</div>
+            </div>
+            <div class="step-item" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-title">Địa chỉ</div>
+            </div>
+            <div class="step-item" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-title">Thời gian & Thiệp</div>
+            </div>
+            <div class="step-item" data-step="5">
+                <div class="step-circle">5</div>
+                <div class="step-title">Xác nhận</div>
+            </div>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div class="alert alert-danger mb-4" role="alert">
+                <strong style="display:block;margin-bottom:.4rem;">Vui lòng kiểm tra lại thông tin:</strong>
+                <ul style="margin:0;padding-left:1.2rem;">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li style="font-size:.82rem;">@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form method="post" asp-action="Checkout" asp-controller="Orders" id="checkout-form" novalidate>
+            @Html.AntiForgeryToken()
+
+            <!-- Hidden container for cart items -->
+            <div id="checkout-items-container"></div>
+            <!-- Hidden field for complete address -->
+            <input type="hidden" asp-for="DeliveryAddress" id="hidden-delivery-address" />
+
+            <!-- ======================================================== -->
+            <!-- BƯỚC 1: GIỎ HÀNG & RÀ SOÁT HOA -->
+            <!-- ======================================================== -->
+            <div class="step-panel" id="step-panel-1">
+                <div class="card p-4 border shadow-sm" style="border-radius:0;background:#fff;">
+                    <h3 style="font-size:1.2rem;margin-bottom:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem;">
+                        Bước 1: Danh sách hoa trong giỏ
+                    </h3>
+                    
+                    <div id="cart-table-container">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <div id="empty-cart-warning" class="text-center py-4" style="display:none;">
+                        <p style="font-size:1rem;color:var(--muted);margin-bottom:1rem;">
+                            Giỏ hoa của bạn đang trống.
+                        </p>
+                        <a href="/Home/New" class="btn btn-petal">
+                            Khám phá bộ sưu tập hoa ↗
+                        </a>
+                    </div>
+
+                    <div id="cart-pricing-summary" style="margin-top:1.5rem;border-top:1px solid var(--line);padding-top:1rem;">
+                        <div class="d-flex justify-content-between mb-2" style="font-size:.85rem;">
+                            <span>Tạm tính tiền hoa:</span>
+                            <strong id="step1-subtotal">0 ₫</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size:.85rem;">
+                            <span>Phí giao hàng:</span>
+                            <strong id="step1-delivery">30.000 ₫</strong>
+                        </div>
+                        <div class="d-flex justify-content-between pt-2 border-top" style="font-size:1.1rem;font-weight:700;">
+                            <span>Tổng tiền dự kiến:</span>
+                            <strong id="step1-total" style="color:var(--leaf);">0 ₫</strong>
+                        </div>
+                        <small style="color:var(--muted);font-size:.72rem;display:block;margin-top:.4rem;">
+                            * Miễn phí giao hàng cho tất cả các đơn từ 500.000 ₫ trở lên.
+                        </small>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" class="btn btn-petal" id="btn-next-to-2">
+                            Tiếp tục: Thông tin người nhận →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- BƯỚC 2: THÔNG TIN NGƯỜI NHẬN -->
+            <!-- ======================================================== -->
+            <div class="step-panel" id="step-panel-2" style="display:none;">
+                <div class="card p-4 border shadow-sm" style="border-radius:0;background:#fff;">
+                    <h3 style="font-size:1.2rem;margin-bottom:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem;">
+                        Bước 2: Thông tin người nhận hoa
+                    </h3>
+
+                    <div class="mb-3">
+                        <label asp-for="RecipientName" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;">
+                            Họ và tên người nhận <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="RecipientName" class="form-control" id="input-recipient-name" placeholder="Ví dụ: Nguyễn Thị Mai" required />
+                        <span asp-validation-for="RecipientName" class="text-danger"></span>
+                        <div class="invalid-feedback" id="val-err-name">Vui lòng nhập tên người nhận.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="RecipientPhone" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;">
+                            Số điện thoại nhận hoa (10 chữ số) <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="RecipientPhone" class="form-control" id="input-recipient-phone" placeholder="Ví dụ: 0901234567" maxlength="10" required />
+                        <span asp-validation-for="RecipientPhone" class="text-danger"></span>
+                        <small style="color:var(--muted);font-size:.7rem;">Shipper sẽ gọi số này trước khi giao hoa 10-15 phút.</small>
+                        <div class="invalid-feedback" id="val-err-phone">Vui lòng nhập đúng 10 chữ số điện thoại (ví dụ: 0901234567).</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;">
+                            Email người đặt (nhận hóa đơn & cập nhật lộ trình giao)
+                        </label>
+                        <input asp-for="Email" class="form-control" id="input-email" placeholder="email@domain.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check p-3 bg-light border mb-2">
+                        <input class="form-check-input ms-0 me-2" type="checkbox" asp-for="IsAnonymousSender" id="check-anonymous">
+                        <label class="form-check-label font-weight-bold" for="check-anonymous" style="font-size:.82rem;">
+                            🌸 Gửi hoa ẩn danh (Bảo mật thông tin người gửi, tạo bất ngờ cho người nhận)
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-back-to-1" style="border-radius:0;">
+                            ← Quay lại giỏ hàng
+                        </button>
+                        <button type="button" class="btn btn-petal" id="btn-next-to-3">
+                            Tiếp tục: Địa chỉ giao hàng →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- BƯỚC 3: ĐỊA CHỈ GIAO HÀNG CHUẨN HÓA 4 CẤP VIỆT NAM -->
+            <!-- ======================================================== -->
+            <div class="step-panel" id="step-panel-3" style="display:none;">
+                <div class="card p-4 border shadow-sm" style="border-radius:0;background:#fff;">
+                    <h3 style="font-size:1.2rem;margin-bottom:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem;">
+                        Bước 3: Địa chỉ giao hoa chuẩn hóa
+                    </h3>
+                    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.2rem;">
+                        Vui lòng chọn lần lượt Tỉnh/Thành phố, Quận/Huyện, Phường/Xã và nhập số nhà để đảm bảo hoa được giao chính xác.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Province" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                                Tỉnh / Thành phố <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Province" class="form-select" id="select-province" data-selected="@Model.Province" required>
+                                <option value="">-- Chọn Tỉnh/Thành --</option>
+                            </select>
+                            <span asp-validation-for="Province" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="District" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                                Quận / Huyện <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="District" class="form-select" id="select-district" data-selected="@Model.District" required disabled>
+                                <option value="">-- Chọn Quận/Huyện --</option>
+                            </select>
+                            <span asp-validation-for="District" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Ward" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                                Phường / Xã <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Ward" class="form-select" id="select-ward" data-selected="@Model.Ward" required disabled>
+                                <option value="">-- Chọn Phường/Xã --</option>
+                            </select>
+                            <span asp-validation-for="Ward" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="StreetAddress" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                                Số nhà, tên đường, tên tòa nhà hoặc căn hộ <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="StreetAddress" class="form-control" id="input-street" placeholder="Ví dụ: 125 Phan Xích Long, Tòa nhà A" required />
+                            <span asp-validation-for="StreetAddress" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Live Combined Address Preview -->
+                    <div class="mt-4 p-3 border" style="background:var(--sage);font-size:.82rem;">
+                        <span style="color:#4a5e4f;font-weight:600;">Xem trước địa chỉ giao hoa hoàn chỉnh:</span>
+                        <div id="preview-address-text" style="font-weight:700;color:var(--leaf);margin-top:.25rem;">
+                            (Chưa có dữ liệu địa chỉ)
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-back-to-2" style="border-radius:0;">
+                            ← Quay lại thông tin người nhận
+                        </button>
+                        <button type="button" class="btn btn-petal" id="btn-next-to-4">
+                            Tiếp tục: Thời gian & Thiệp →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- BƯỚC 4: THỜI GIAN GIAO & LỜI NHẮN THIỆP -->
+            <!-- ======================================================== -->
+            <div class="step-panel" id="step-panel-4" style="display:none;">
+                <div class="card p-4 border shadow-sm" style="border-radius:0;background:#fff;">
+                    <h3 style="font-size:1.2rem;margin-bottom:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem;">
+                        Bước 4: Thời gian giao hoa & Lời nhắn thiệp
+                    </h3>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="DeliveryDate" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                                Ngày giao hoa mong muốn
+                            </label>
+                            <input asp-for="DeliveryDate" type="date" class="form-control" id="input-delivery-date"
+                                   min="@todayStr" value="@todayStr" />
+                            <small style="color:var(--muted);font-size:.7rem;">Không chọn ngày trong quá khứ.</small>
+                            <span asp-validation-for="DeliveryDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="DeliveryTimeSlot" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                                Khung giờ nhận hoa
+                            </label>
+                            <select asp-for="DeliveryTimeSlot" class="form-select" id="select-timeslot">
+                                <option value="Giao nhanh hỏa tốc trong 2 giờ">⚡ Giao nhanh hỏa tốc trong 2 giờ</option>
+                                <option value="Sáng (08:00 – 11:30)">Buổi sáng (08:00 – 11:30)</option>
+                                <option value="Chiều (13:30 – 17:30)" selected>Buổi chiều (13:30 – 17:30)</option>
+                                <option value="Tối (18:00 – 20:30)">Buổi tối (18:00 – 20:30)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Mẫu thiệp chúc mừng có sẵn -->
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                            Chọn mẫu thiệp chúc mừng có sẵn (Click để tự điền):
+                        </label>
+                        <div class="d-flex flex-wrap gap-2 mb-2" id="card-template-chips">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-msg="Chúc bạn một sinh nhật thật nhiều niềm vui, luôn rạng rỡ và tỏa ngát hương như những đóa hoa tươi đẹp nhất! 🎂🌸" style="font-size:.72rem;border-radius:0;">
+                                🎂 Sinh nhật
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-msg="Chúc mừng ngày 20/10! Chúc người phụ nữ tuyệt vời nhất luôn xinh đẹp, hạnh phúc và bình an trong cuộc sống! 💖" style="font-size:.72rem;border-radius:0;">
+                                🌸 Lễ 20/10
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-msg="Chúc mừng khai trương hồng phát! Chúc cửa hàng buôn may bán đắt, vạn sự hanh thông và phát tài phát lộc! 🎊" style="font-size:.72rem;border-radius:0;">
+                                🎊 Khai trương
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-msg="Cảm ơn vì đã luôn đồng hành và sẻ chia cùng anh/em. Yêu em/anh nhiều hơn mỗi ngày! 💕" style="font-size:.72rem;border-radius:0;">
+                                💕 Tình yêu
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-msg="Gửi lời tri ân sâu sắc và sự biết ơn chân thành nhất đến bạn/thầy cô vì tất cả những điều tuyệt vời! 🌿" style="font-size:.72rem;border-radius:0;">
+                                🌿 Tri ân
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CardMessage" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                            Nội dung thiệp viết tay tặng kèm (Miễn phí)
+                        </label>
+                        <textarea asp-for="CardMessage" class="form-control" id="input-card-message" rows="3"
+                                  placeholder="Nhập lời chúc muốn Lá & Nụ viết tay lên thiệp gửi người nhận..."></textarea>
+                        <span asp-validation-for="CardMessage" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CustomerNote" class="form-label font-weight-bold" style="font-size:.78rem;text-transform:uppercase;">
+                            Ghi chú thêm cho thợ cắm hoa & tài xế
+                        </label>
+                        <textarea asp-for="CustomerNote" class="form-control" id="input-customer-note" rows="2"
+                                  placeholder="Ví dụ: Giao tận tay người nhận, gọi trước 15 phút, chọn tone hoa màu hồng phấn..."></textarea>
+                        <span asp-validation-for="CustomerNote" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-back-to-3" style="border-radius:0;">
+                            ← Quay lại địa chỉ
+                        </button>
+                        <button type="button" class="btn btn-petal" id="btn-next-to-5">
+                            Tiếp tục: Rà soát & Thanh toán →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- BƯỚC 5: RÀ SOÁT & XÁC NHẬN THANH TOÁN -->
+            <!-- ======================================================== -->
+            <div class="step-panel" id="step-panel-5" style="display:none;">
+                <div class="card p-4 border shadow-sm" style="border-radius:0;background:#fff;">
+                    <h3 style="font-size:1.2rem;margin-bottom:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem;">
+                        Bước 5: Rà soát đơn hàng & Thanh toán
+                    </h3>
+
+                    <!-- Tóm tắt thông tin người nhận & địa chỉ -->
+                    <div class="p-3 mb-3 bg-light border" style="font-size:.82rem;">
+                        <h4 style="font-size:.9rem;color:var(--leaf);margin-bottom:.5rem;font-family:'DM Sans',sans-serif;font-weight:700;">
+                            📋 Thông tin giao nhận
+                        </h4>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <strong>Người nhận:</strong> <span id="review-recipient-name">-</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Số điện thoại:</strong> <span id="review-recipient-phone">-</span>
+                            </div>
+                            <div class="col-12">
+                                <strong>Địa chỉ giao:</strong> <span id="review-address">-</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Ngày nhận hoa:</strong> <span id="review-date">-</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Khung giờ:</strong> <span id="review-timeslot">-</span>
+                            </div>
+                            <div class="col-12" id="review-card-msg-wrap" style="display:none;">
+                                <strong>Lời nhắn thiệp:</strong> <em id="review-card-message" style="color:var(--rose);">-</em>
+                            </div>
+                            <div class="col-12" id="review-note-wrap" style="display:none;">
+                                <strong>Ghi chú:</strong> <span id="review-note">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng tóm tắt danh sách hoa -->
+                    <div id="review-items-summary" class="mb-3">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Chi phí -->
+                    <div class="border-top pt-3 mb-4">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:.85rem;">
+                            <span>Tạm tính tiền hoa:</span>
+                            <strong id="review-subtotal">0 ₫</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1" style="font-size:.85rem;">
+                            <span>Phí giao hàng:</span>
+                            <strong id="review-delivery">0 ₫</strong>
+                        </div>
+                        <div class="d-flex justify-content-between pt-2 border-top" style="font-size:1.15rem;font-weight:700;">
+                            <span>Tổng thanh toán:</span>
+                            <strong id="review-total" style="color:var(--leaf);">0 ₫</strong>
+                        </div>
+                    </div>
+
+                    <!-- Phương thức thanh toán -->
+                    <div class="mb-4">
+                        <label class="form-label font-weight-bold" style="font-size:.82rem;text-transform:uppercase;">
+                            Chọn phương thức thanh toán:
+                        </label>
+                        <div class="d-grid gap-2">
+                            <label class="p-3 border d-flex align-items-center gap-3 cursor-pointer" style="background:var(--cream);">
+                                <input type="radio" asp-for="PaymentMethod" value="COD" checked id="pay-cod" />
+                                <div>
+                                    <strong style="font-size:.88rem;display:block;">💵 Thanh toán khi nhận hàng (COD)</strong>
+                                    <small style="color:var(--muted);font-size:.72rem;">Nhận hoa tươi, kiểm tra đúng mẫu mã và thanh toán tiền mặt cho shipper.</small>
+                                </div>
+                            </label>
+
+                            <label class="p-3 border d-flex align-items-start gap-3 cursor-pointer" style="background:var(--cream);">
+                                <input type="radio" asp-for="PaymentMethod" value="BankTransfer" id="pay-bank" class="mt-1" />
+                                <div class="flex-grow-1">
+                                    <strong style="font-size:.88rem;display:block;">💳 Chuyển khoản ngân hàng (VietQR)</strong>
+                                    <small style="color:var(--muted);font-size:.72rem;">Chuyển khoản qua mã QR ngân hàng tiện lợi và nhanh chóng.</small>
+                                    
+                                    <!-- Chi tiết QR giả lập -->
+                                    <div id="bank-transfer-details" class="mt-2 p-3 bg-white border" style="display:none;font-size:.78rem;">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div style="width:80px;height:80px;background:#f0eee5;border:1px dashed var(--leaf);display:grid;place-items:center;font-size:.65rem;text-align:center;">
+                                                QR MÃ THANH TOÁN
+                                            </div>
+                                            <div>
+                                                <div><strong>Ngân hàng:</strong> Vietcombank (Chi nhánh TP.HCM)</div>
+                                                <div><strong>Số tài khoản:</strong> <code>1029384756</code></div>
+                                                <div><strong>Chủ tài khoản:</strong> LÁ VÀ NỤ FLOWER STUDIO</div>
+                                                <div><strong>Nội dung CK:</strong> <code>[Mã đơn hàng] - SĐT</code></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-back-to-4" style="border-radius:0;">
+                            ← Quay lại lời nhắn
+                        </button>
+                        <button type="submit" class="btn btn-petal px-4 py-2" id="btn-final-submit" style="font-size:.9rem;">
+                            🌸 Hoàn tất & Đặt hoa ngay
+                        </button>
+                    </div>
+
+                    <small class="text-center d-block mt-3" style="color:var(--muted);font-size:.7rem;">
+                        Sau khi đặt hoa, nhân viên của Lá & Nụ sẽ gọi điện thoại xác nhận trong vòng 15-30 phút.
+                    </small>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+(function() {
+    // 1. Dữ liệu hành chính chuẩn hóa Việt Nam (Mô phỏng chân thực)
+    const administrativeData = {
+        "TP. Hồ Chí Minh": {
+            "Quận 1": ["Phường Bến Nghé", "Phường Bến Thành", "Phường Đa Kao", "Phường Tân Định", "Phường Phạm Ngũ Lão"],
+            "Quận 3": ["Phường Võ Thị Sáu", "Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5"],
+            "Quận Phú Nhuận": ["Phường 1", "Phường 2", "Phường 7", "Phường 9", "Phường 15"],
+            "Quận Bình Thạnh": ["Phường 1", "Phường 2", "Phường 19", "Phường 25", "Phường 26"],
+            "Quận Tân Bình": ["Phường 1", "Phường 2", "Phường 4", "Phường 12", "Phường 13"],
+            "Quận 7": ["Phường Tân Phong", "Phường Tân Phú", "Phường Tân Quy", "Phường Phú Mỹ"],
+            "TP. Thủ Đức": ["Phường Thảo Điền", "Phường An Phú", "Phường Hiệp Bình Chánh", "Phường Linh Chiểu"]
+        },
+        "TP. Hà Nội": {
+            "Quận Ba Đình": ["Phường Điện Bàn", "Phường Đội Cấn", "Phường Giảng Võ", "Phường Kim Mã", "Phường Liễu Giai"],
+            "Quận Hoàn Kiếm": ["Phường Hàng Bạc", "Phường Hàng Buồm", "Phường Hàng Gai", "Phường Tràng Tiền", "Phường Cửa Nam"],
+            "Quận Cầu Giấy": ["Phường Dịch Vọng", "Phường Dịch Vọng Hậu", "Phường Nghĩa Đô", "Phường Yên Hòa"],
+            "Quận Đống Đa": ["Phường Cát Linh", "Phường Láng Hạ", "Phường Ô Chợ Dừa", "Phường Văn Miếu"]
+        },
+        "TP. Đà Nẵng": {
+            "Quận Hải Châu": ["Phường Hải Châu 1", "Phường Thạch Thang", "Phường Thanh Bình", "Phường Hòa Cường Bắc"],
+            "Quận Sơn Trà": ["Phường An Hải Bắc", "Phường Phước Mỹ", "Phường Mân Thái"],
+            "Quận Thanh Khê": ["Phường Vĩnh Trung", "Phường Tân Chính", "Phường Tam Thuận"]
+        },
+        "TP. Cần Thơ": {
+            "Quận Ninh Kiều": ["Phường Tân An", "Phường An Cư", "Phường Xuân Khánh", "Phường An Khánh"],
+            "Quận Cái Răng": ["Phường Lê Bình", "Phường Hưng Phú", "Phường Ba Láng"]
+        },
+        "Tỉnh Bình Dương": {
+            "TP. Thủ Dầu Một": ["Phường Phú Cường", "Phường Hiệp Thành", "Phường Phú Hòa"],
+            "TP. Dĩ An": ["Phường Dĩ An", "Phường Đông Hòa", "Phường Tân Đông Hiệp"]
+        },
+        "Tỉnh Đồng Nai": {
+            "TP. Biên Hòa": ["Phường Quyết Thắng", "Phường Trung Dũng", "Phường Thống Nhất", "Phường Tân Phong"]
+        }
+    };
+
+    const html = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const currency = val => new Intl.NumberFormat('vi-VN').format(val) + ' ₫';
+    const FREE_SHIP = 500000;
+    const SHIP_FEE = 30000;
+
+    let currentStep = 1;
+    let cart = {};
+    try { cart = JSON.parse(localStorage.getItem('laNuCart') || '{}'); } catch(e) {}
+    if (!cart || typeof cart !== 'object' || Array.isArray(cart)) cart = {};
+
+    // Lấy danh sách sản phẩm trong giỏ
+    function getCartLines() {
+        return Object.entries(cart)
+            .map(([id, item]) => ({
+                id: String(id),
+                name: item && item.name ? item.name : '',
+                price: Number(item && item.price ? item.price : 0),
+                image: item && item.image ? item.image : '/assets/tulips.jpg',
+                quantity: Number(item && item.quantity ? item.quantity : 0)
+            }))
+            .filter(l => l.name && /^[1-9][0-9]*$/.test(l.id) && Number.isInteger(l.quantity) && l.quantity > 0 && l.quantity <= 100 && Number.isFinite(l.price) && l.price >= 0);
+    }
+
+    // 2. Render bảng giỏ hàng ở Bước 1
+    function renderStep1Cart() {
+        const lines = getCartLines();
+        const container = document.getElementById('cart-table-container');
+        const emptyWarning = document.getElementById('empty-cart-warning');
+        const pricingSummary = document.getElementById('cart-pricing-summary');
+        const nextBtn = document.getElementById('btn-next-to-2');
+
+        if (lines.length === 0) {
+            if (container) container.innerHTML = '';
+            if (emptyWarning) emptyWarning.style.display = 'block';
+            if (pricingSummary) pricingSummary.style.display = 'none';
+            if (nextBtn) nextBtn.disabled = true;
+            return;
+        }
+
+        if (emptyWarning) emptyWarning.style.display = 'none';
+        if (pricingSummary) pricingSummary.style.display = 'block';
+        if (nextBtn) nextBtn.disabled = false;
+
+        const subtotal = lines.reduce((s, l) => s + (l.price * l.quantity), 0);
+        const delivery = subtotal >= FREE_SHIP ? 0 : SHIP_FEE;
+        const total = subtotal + delivery;
+
+        if (container) {
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table align-middle" style="font-size:.82rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:70px;">Hình ảnh</th>
+                                <th>Mẫu hoa</th>
+                                <th class="text-center" style="width:120px;">Số lượng</th>
+                                <th class="text-end" style="width:110px;">Thành tiền</th>
+                                <th style="width:40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${lines.map(l => `
+                                <tr>
+                                    <td>
+                                        <img src="${html(l.image)}" alt="" style="width:55px;height:60px;object-fit:cover;border:1px solid var(--line);" />
+                                    </td>
+                                    <td>
+                                        <div style="font-weight:700;font-size:.88rem;">${html(l.name)}</div>
+                                        <div style="color:var(--muted);font-size:.72rem;">${currency(l.price)} / bó</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-inline-flex align-items-center gap-1 border bg-white p-1">
+                                            <button type="button" class="btn btn-sm py-0 px-2 btn-cart-qty" data-id="${html(l.id)}" data-delta="-1">−</button>
+                                            <span style="min-width:24px;display:inline-block;font-weight:600;">${l.quantity}</span>
+                                            <button type="button" class="btn btn-sm py-0 px-2 btn-cart-qty" data-id="${html(l.id)}" data-delta="1">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="text-end" style="font-weight:700;color:var(--leaf);">
+                                        ${currency(l.price * l.quantity)}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm text-danger btn-cart-remove" data-id="${html(l.id)}" title="Xóa hoa">×</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        const elSub = document.getElementById('step1-subtotal');
+        if (elSub) elSub.textContent = currency(subtotal);
+        const elDel = document.getElementById('step1-delivery');
+        if (elDel) elDel.textContent = delivery === 0 ? 'Miễn phí' : currency(delivery);
+        const elTot = document.getElementById('step1-total');
+        if (elTot) elTot.textContent = currency(total);
+
+        // Render hidden inputs for form submission
+        const hiddenContainer = document.getElementById('checkout-items-container');
+        if (hiddenContainer) {
+            hiddenContainer.innerHTML = lines.map((l, idx) => `
+                <input type="hidden" name="Items[${idx}].ProductId" value="${html(l.id)}" />
+                <input type="hidden" name="Items[${idx}].Quantity" value="${l.quantity}" />
+            `).join('');
+        }
+    }
+
+    // 3. Xử lý Cascading Selects cho địa chỉ
+    const selProvince = document.getElementById('select-province');
+    const selDistrict = document.getElementById('select-district');
+    const selWard = document.getElementById('select-ward');
+    const inputStreet = document.getElementById('input-street');
+    const previewAddress = document.getElementById('preview-address-text');
+    const hiddenAddress = document.getElementById('hidden-delivery-address');
+
+    function initAddressDropdowns() {
+        if (!selProvince) return;
+        selProvince.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>' +
+            Object.keys(administrativeData).map(p => `<option value="${p}">${p}</option>`).join('');
+
+        selProvince.addEventListener('change', function() {
+            const p = this.value;
+            selDistrict.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+            selWard.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+            selWard.disabled = true;
+
+            if (p && administrativeData[p]) {
+                selDistrict.disabled = false;
+                Object.keys(administrativeData[p]).forEach(d => {
+                    selDistrict.innerHTML += `<option value="${d}">${d}</option>`;
+                });
+            } else {
+                selDistrict.disabled = true;
+            }
+            updateCombinedAddress();
+        });
+
+        selDistrict.addEventListener('change', function() {
+            const p = selProvince.value;
+            const d = this.value;
+            selWard.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+
+            if (p && d && administrativeData[p] && administrativeData[p][d]) {
+                selWard.disabled = false;
+                administrativeData[p][d].forEach(w => {
+                    selWard.innerHTML += `<option value="${w}">${w}</option>`;
+                });
+            } else {
+                selWard.disabled = true;
+            }
+            updateCombinedAddress();
+        });
+
+        selWard.addEventListener('change', updateCombinedAddress);
+        if (inputStreet) inputStreet.addEventListener('input', updateCombinedAddress);
+        selProvince.value = selProvince.dataset.selected || '';
+        selProvince.dispatchEvent(new Event('change'));
+        selDistrict.value = selDistrict.dataset.selected || '';
+        selDistrict.dispatchEvent(new Event('change'));
+        selWard.value = selWard.dataset.selected || '';
+        updateCombinedAddress();
+    }
+
+    function updateCombinedAddress() {
+        const p = selProvince?.value || '';
+        const d = selDistrict?.value || '';
+        const w = selWard?.value || '';
+        const s = inputStreet?.value.trim() || '';
+
+        const parts = [];
+        if (s) parts.push(s);
+        if (w) parts.push(w);
+        if (d) parts.push(d);
+        if (p) parts.push(p);
+
+        const full = parts.join(', ');
+        if (previewAddress) {
+            previewAddress.textContent = full || '(Chưa có dữ liệu địa chỉ)';
+        }
+        if (hiddenAddress) {
+            hiddenAddress.value = full;
+        }
+    }
+
+    // 4. Mẫu thiệp chúc mừng
+    const chipButtons = document.querySelectorAll('#card-template-chips button');
+    chipButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const msg = this.dataset.msg;
+            const cardInput = document.getElementById('input-card-message');
+            if (cardInput) {
+                cardInput.value = msg;
+                cardInput.focus();
+            }
+        });
+    });
+
+    // 5. Đổi phương thức thanh toán
+    const radioBank = document.getElementById('pay-bank');
+    const radioCod = document.getElementById('pay-cod');
+    const bankDetails = document.getElementById('bank-transfer-details');
+
+    function toggleBankDetails() {
+        if (bankDetails) {
+            bankDetails.style.display = radioBank?.checked ? 'block' : 'none';
+        }
+    }
+    radioBank?.addEventListener('change', toggleBankDetails);
+    radioCod?.addEventListener('change', toggleBankDetails);
+
+    // 6. Chuyển đổi giữa các bước (Stepper Controller)
+    function showStep(stepNumber) {
+        currentStep = stepNumber;
+
+        // Cập nhật tab stepper header
+        document.querySelectorAll('.step-item').forEach(el => {
+            const step = Number(el.dataset.step);
+            el.classList.remove('active', 'completed');
+            if (step === currentStep) el.classList.add('active');
+            else if (step < currentStep) el.classList.add('completed');
+        });
+
+        // Ẩn tất cả panels và mở panel tương ứng
+        document.querySelectorAll('.step-panel').forEach(p => p.style.display = 'none');
+        const activePanel = document.getElementById(`step-panel-${currentStep}`);
+        if (activePanel) activePanel.style.display = 'block';
+
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+
+        // Nếu chuyển sang bước 5 -> Cập nhật tóm tắt rà soát
+        if (currentStep === 5) {
+            renderStep5Review();
+        }
+    }
+
+    function renderStep5Review() {
+        const name = document.getElementById('input-recipient-name')?.value.trim() || '';
+        const phone = document.getElementById('input-recipient-phone')?.value.trim() || '';
+        const address = hiddenAddress?.value.trim() || '';
+        const date = document.getElementById('input-delivery-date')?.value || '';
+        const timeslot = document.getElementById('select-timeslot')?.value || '';
+        const cardMsg = document.getElementById('input-card-message')?.value.trim() || '';
+        const note = document.getElementById('input-customer-note')?.value.trim() || '';
+        const isAnon = document.getElementById('check-anonymous')?.checked;
+
+        const revName = document.getElementById('review-recipient-name');
+        if (revName) revName.textContent = name + (isAnon ? ' (Giao hoa ẩn danh)' : '');
+        const revPhone = document.getElementById('review-recipient-phone');
+        if (revPhone) revPhone.textContent = phone;
+        const revAddr = document.getElementById('review-address');
+        if (revAddr) revAddr.textContent = address;
+        const revDate = document.getElementById('review-date');
+        if (revDate) revDate.textContent = date;
+        const revTime = document.getElementById('review-timeslot');
+        if (revTime) revTime.textContent = timeslot;
+
+        const revCardWrap = document.getElementById('review-card-msg-wrap');
+        const revCard = document.getElementById('review-card-message');
+        if (cardMsg && revCardWrap && revCard) {
+            revCardWrap.style.display = 'block';
+            revCard.textContent = `“${cardMsg}”`;
+        } else if (revCardWrap) {
+            revCardWrap.style.display = 'none';
+        }
+
+        const revNoteWrap = document.getElementById('review-note-wrap');
+        const revNote = document.getElementById('review-note');
+        if (note && revNoteWrap && revNote) {
+            revNoteWrap.style.display = 'block';
+            revNote.textContent = note;
+        } else if (revNoteWrap) {
+            revNoteWrap.style.display = 'none';
+        }
+
+        // Tóm tắt danh sách hoa bước 5
+        const lines = getCartLines();
+        const subtotal = lines.reduce((s, l) => s + (l.price * l.quantity), 0);
+        const delivery = subtotal >= FREE_SHIP ? 0 : SHIP_FEE;
+        const total = subtotal + delivery;
+
+        const summaryBox = document.getElementById('review-items-summary');
+        if (summaryBox) {
+            summaryBox.innerHTML = lines.map(l => `
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="font-size:.82rem;">
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="${html(l.image)}" alt="" style="width:40px;height:45px;object-fit:cover;border:1px solid var(--line);" />
+                        <div>
+                            <strong>${html(l.name)}</strong>
+                            <div style="font-size:.7rem;color:var(--muted);">${currency(l.price)} × ${l.quantity}</div>
+                        </div>
+                    </div>
+                    <strong style="color:var(--leaf);">${currency(l.price * l.quantity)}</strong>
+                </div>
+            `).join('');
+        }
+
+        const revSub = document.getElementById('review-subtotal');
+        if (revSub) revSub.textContent = currency(subtotal);
+        const revDel = document.getElementById('review-delivery');
+        if (revDel) revDel.textContent = delivery === 0 ? 'Miễn phí' : currency(delivery);
+        const revTot = document.getElementById('review-total');
+        if (revTot) revTot.textContent = currency(total);
+    }
+
+    // 7. Validation logic giữa các bước
+    document.getElementById('btn-next-to-2')?.addEventListener('click', () => {
+        if (getCartLines().length === 0) {
+            alert('Giỏ hàng của bạn đang trống.');
+            return;
+        }
+        showStep(2);
+    });
+
+    document.getElementById('btn-back-to-1')?.addEventListener('click', () => showStep(1));
+
+    document.getElementById('btn-next-to-3')?.addEventListener('click', () => {
+        const name = document.getElementById('input-recipient-name')?.value.trim();
+        const phone = document.getElementById('input-recipient-phone')?.value.trim();
+        const phoneRegex = /^0\d{9}$/;
+
+        if (!name) {
+            alert('Vui lòng nhập họ và tên người nhận hoa.');
+            document.getElementById('input-recipient-name')?.focus();
+            return;
+        }
+        if (!phone || !phoneRegex.test(phone)) {
+            alert('Vui lòng nhập đúng số điện thoại gồm 10 chữ số (ví dụ: 0901234567).');
+            document.getElementById('input-recipient-phone')?.focus();
+            return;
+        }
+        showStep(3);
+    });
+
+    document.getElementById('btn-back-to-2')?.addEventListener('click', () => showStep(2));
+
+    document.getElementById('btn-next-to-4')?.addEventListener('click', () => {
+        const p = selProvince?.value;
+        const d = selDistrict?.value;
+        const w = selWard?.value;
+        const s = inputStreet?.value.trim();
+
+        if (!p) {
+            alert('Vui lòng chọn Tỉnh / Thành phố.');
+            selProvince?.focus();
+            return;
+        }
+        if (!d) {
+            alert('Vui lòng chọn Quận / Huyện.');
+            selDistrict?.focus();
+            return;
+        }
+        if (!w) {
+            alert('Vui lòng chọn Phường / Xã.');
+            selWard?.focus();
+            return;
+        }
+        if (!s) {
+            alert('Vui lòng nhập số nhà, tên đường hoặc tòa nhà.');
+            inputStreet?.focus();
+            return;
+        }
+
+        updateCombinedAddress();
+        showStep(4);
+    });
+
+    document.getElementById('btn-back-to-3')?.addEventListener('click', () => showStep(3));
+
+    document.getElementById('btn-next-to-5')?.addEventListener('click', () => {
+        const dateInput = document.getElementById('input-delivery-date')?.value;
+        if (dateInput) {
+            const chosen = new Date(dateInput);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if (chosen < today) {
+                alert('Ngày nhận hoa không thể ở quá khứ. Vui lòng chọn ngày từ hôm nay trở đi.');
+                return;
+            }
+        }
+        showStep(5);
+    });
+
+    document.getElementById('btn-back-to-4')?.addEventListener('click', () => showStep(4));
+
+    // Xử lý giỏ hàng +/- ở bước 1
+    document.addEventListener('click', function(e) {
+        const qtyBtn = e.target.closest('.btn-cart-qty');
+        if (qtyBtn) {
+            const id = qtyBtn.dataset.id;
+            const delta = Number(qtyBtn.dataset.delta);
+            if (cart[id]) {
+                const currentQty = Number(typeof cart[id] === 'object' ? cart[id].quantity : cart[id]) || 0;
+                const newQty = currentQty + delta;
+                if (newQty <= 0) {
+                    delete cart[id];
+                } else {
+                    cart[id].quantity = newQty;
+                }
+                localStorage.setItem('laNuCart', JSON.stringify(cart));
+                renderStep1Cart();
+            }
+            return;
+        }
+
+        const rmBtn = e.target.closest('.btn-cart-remove');
+        if (rmBtn) {
+            const id = rmBtn.dataset.id;
+            delete cart[id];
+            localStorage.setItem('laNuCart', JSON.stringify(cart));
+            renderStep1Cart();
+            return;
+        }
+    });
+
+    // Submit form: chỉ cập nhật địa chỉ, giữ giỏ nếu server báo lỗi
+    document.getElementById('checkout-form')?.addEventListener('submit', function() {
+        updateCombinedAddress();
+        // Chỉ xóa giỏ trên trang Confirmation sau khi server đã lưu đơn thành công.
+    });
+
+    // Khởi tạo ban đầu
+    initAddressDropdowns();
+    renderStep1Cart();
+})();
+</script>
+}

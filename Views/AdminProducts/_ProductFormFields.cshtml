@@ -1,0 +1,79 @@
+@model LTW09.ViewModels.ProductFormViewModel
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div style="background:#fff5f4;border-left:4px solid var(--rose);padding:1rem 1.2rem;margin-bottom:1.5rem;">
+        <ul style="margin:0;padding-left:1.2rem;font-size:.82rem;">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<div style="display:grid;gap:1.1rem;">
+    <div>
+        <label asp-for="CategoryId" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select" style="border-radius:0;">
+            <option value="">-- Chọn danh mục --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger" style="font-size:.75rem;"></span>
+    </div>
+
+    <div>
+        <label asp-for="Name" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+        <input asp-for="Name" class="form-control" style="border-radius:0;" placeholder="Ví dụ: Nắng đầu mùa" />
+        <span asp-validation-for="Name" class="text-danger" style="font-size:.75rem;"></span>
+    </div>
+
+    <div>
+        <label asp-for="Slug" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+        <input asp-for="Slug" class="form-control" style="border-radius:0;" placeholder="nang-dau-mua" />
+        <small style="color:var(--muted);font-size:.7rem;">Chỉ chữ thường, số và dấu gạch ngang. VD: nang-dau-mua</small>
+        <span asp-validation-for="Slug" class="text-danger" style="font-size:.75rem;display:block;"></span>
+    </div>
+
+    <div>
+        <label asp-for="Description" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+        <input asp-for="Description" class="form-control" style="border-radius:0;" placeholder="Tulip hồng · 10 cành" />
+        <span asp-validation-for="Description" class="text-danger" style="font-size:.75rem;"></span>
+    </div>
+
+    <div>
+        <label asp-for="Label" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+        <input asp-for="Label" class="form-control" style="border-radius:0;" placeholder="Bán chạy / Mới / Số lượng có hạn" />
+        <span asp-validation-for="Label" class="text-danger" style="font-size:.75rem;"></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+            <label asp-for="Price" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+            <input asp-for="Price" type="number" min="0" class="form-control" style="border-radius:0;" placeholder="590000" />
+            <span asp-validation-for="Price" class="text-danger" style="font-size:.75rem;"></span>
+        </div>
+        <div>
+            <label asp-for="StockQuantity" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+            <input asp-for="StockQuantity" type="number" min="0" class="form-control" style="border-radius:0;" placeholder="10" />
+            <span asp-validation-for="StockQuantity" class="text-danger" style="font-size:.75rem;"></span>
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="ImageUrl" style="font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:.3rem;"></label>
+        <input asp-for="ImageUrl" class="form-control" style="border-radius:0;" placeholder="/assets/tulips.jpg" />
+        <small style="color:var(--muted);font-size:.7rem;">Đường dẫn tương đối từ wwwroot, VD: /assets/tulips.jpg</small>
+        <span asp-validation-for="ImageUrl" class="text-danger" style="font-size:.75rem;display:block;"></span>
+    </div>
+
+    <div style="display:flex;gap:2rem;align-items:center;">
+        <div class="form-check">
+            <input asp-for="IsActive" class="form-check-input" type="checkbox" id="isActive" />
+            <label asp-for="IsActive" class="form-check-label" style="font-size:.84rem;" for="isActive"></label>
+        </div>
+        <div class="form-check">
+            <input asp-for="IsFeatured" class="form-check-input" type="checkbox" id="isFeatured" />
+            <label asp-for="IsFeatured" class="form-check-label" style="font-size:.84rem;" for="isFeatured"></label>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+    var roleLabel = roles.Contains("Admin") ? "Quản trị viên" :
+                    roles.Contains("Nhân viên") ? "Nhân viên" :
+                    roles.Contains("Khách hàng") ? "Khách hàng" :
+                    roles.FirstOrDefault() ?? "Thành viên";
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="user-badge" title="@User.Identity?.Name">
+            <span class="user-role-tag">@roleLabel</span>
+            <span class="user-email-text">@(user?.Email?.Split('@')[0] ?? User.Identity?.Name)</span>
+        </span>
+        <form asp-area="Identity" asp-page="/Account/Logout"
+              asp-route-returnUrl="@Url.Action("Index", "Home")"
+              method="post" class="d-inline m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout" title="Đăng xuất khỏi tài khoản">
+                Đăng xuất ⎋
+            </button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="d-flex align-items-center gap-2">
+        <a class="nav-link nav-auth"
+           asp-area="Identity" asp-page="/Account/Login">
+            Đăng nhập
+        </a>
+        <a class="btn-signup"
+           asp-area="Identity" asp-page="/Account/Register">
+            Đăng ký
+        </a>
+    </div>
+}

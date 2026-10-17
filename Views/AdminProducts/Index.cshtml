@@ -1,0 +1,104 @@
+@model IEnumerable<LTW09.Models.Product>
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+}
+
+<section class="section" style="background:var(--paper);min-height:80vh;">
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+            <div>
+                <p class="section-label">QUẢN TRỊ</p>
+                <h1 style="font-size:2rem;margin:0;">Danh sách sản phẩm</h1>
+            </div>
+            <a asp-action="Create" class="btn btn-petal">+ Thêm sản phẩm</a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div style="background:#e8f5e9;border-left:4px solid #4caf50;padding:.9rem 1.2rem;margin-bottom:1.5rem;font-size:.84rem;">
+                ✓ @TempData["Success"]
+            </div>
+        }
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:.82rem;">
+                <thead>
+                    <tr style="border-bottom:2px solid var(--line);text-align:left;">
+                        <th style="padding:.6rem .8rem;">Ảnh</th>
+                        <th style="padding:.6rem .8rem;">Tên sản phẩm</th>
+                        <th style="padding:.6rem .8rem;">Danh mục</th>
+                        <th style="padding:.6rem .8rem;text-align:right;">Giá</th>
+                        <th style="padding:.6rem .8rem;text-align:center;">Tồn kho</th>
+                        <th style="padding:.6rem .8rem;text-align:center;">Trạng thái</th>
+                        <th style="padding:.6rem .8rem;text-align:center;">Nổi bật</th>
+                        <th style="padding:.6rem .8rem;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr style="border-bottom:1px solid var(--line);@(!p.IsActive ? "opacity:.5;" : "")">
+                            <td style="padding:.5rem .8rem;">
+                                <img src="@p.ImageUrl" alt="@p.Name"
+                                     style="width:50px;height:54px;object-fit:cover;" />
+                            </td>
+                            <td style="padding:.5rem .8rem;">
+                                <strong>@p.Name</strong>
+                                @if (!string.IsNullOrWhiteSpace(p.Label))
+                                {
+                                    <br /><span style="font-size:.68rem;color:var(--leaf);background:var(--sage);padding:.15rem .4rem;">@p.Label</span>
+                                }
+                            </td>
+                            <td style="padding:.5rem .8rem;color:var(--muted);">@(p.Category?.Name ?? "—")</td>
+                            <td style="padding:.5rem .8rem;text-align:right;font-weight:600;color:var(--leaf);">
+                                @p.Price.ToString("N0") ₫
+                            </td>
+                            <td style="padding:.5rem .8rem;text-align:center;">
+                                <span style="@(p.StockQuantity <= 5 ? "color:var(--rose);font-weight:700;" : "")">
+                                    @p.StockQuantity
+                                </span>
+                            </td>
+                            <td style="padding:.5rem .8rem;text-align:center;">
+                                @if (p.IsActive)
+                                {
+                                    <span style="color:#2e7d32;font-size:.72rem;font-weight:600;">● Đang bán</span>
+                                }
+                                else
+                                {
+                                    <span style="color:#999;font-size:.72rem;">● Ẩn</span>
+                                }
+                            </td>
+                            <td style="padding:.5rem .8rem;text-align:center;">
+                                @(p.IsFeatured ? "⭐" : "—")
+                            </td>
+                            <td style="padding:.5rem .8rem;">
+                                <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                                    <a asp-action="Edit" asp-route-id="@p.ProductId"
+                                       style="font-size:.72rem;color:var(--leaf);font-weight:600;">Sửa</a>
+                                    <span style="color:var(--line);">|</span>
+                                    <a asp-action="Inventory" asp-route-id="@p.ProductId"
+                                       style="font-size:.72rem;color:var(--muted);">Kho</a>
+                                    <span style="color:var(--line);">|</span>
+                                    <a asp-action="Delete" asp-route-id="@p.ProductId"
+                                       style="font-size:.72rem;color:var(--rose);">Ẩn</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top:1.5rem;display:flex;gap:1.2rem;align-items:center;">
+            <a asp-controller="AdminOrders" asp-action="Index"
+               style="font-size:.78rem;color:var(--leaf);font-weight:600;">→ Xem danh sách đơn hàng</a>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-controller="AdminUsers" asp-action="Index"
+                   style="font-size:.78rem;color:var(--rose);font-weight:600;">→ Quản lý tài khoản & Phân quyền</a>
+            }
+            <a asp-controller="Home" asp-action="Index"
+               style="font-size:.78rem;color:var(--muted);">→ Về trang chủ</a>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,30 @@
+@model LTW09.Models.Product
+@{ var p = Model; }
+<article class="product-card" data-product-card="@p.ProductId" data-category="@p.Category?.Slug" data-name="@p.Name @p.Description @p.Label">
+    <div class="product-image">
+        <button class="product-open-image" type="button" data-product-open="@p.ProductId" aria-label="Xem chi tiết @p.Name">
+            <img src="@p.ImageUrl" alt="@p.Name" loading="lazy" />
+        </button>
+        @if (!string.IsNullOrWhiteSpace(p.Label))
+        {
+            <span class="product-ribbon">@p.Label</span>
+        }
+        <button class="product-favorite" type="button" data-favorite="@p.ProductId" aria-pressed="false" aria-label="Yêu thích @p.Name">♡</button>
+        <button class="quick-add" type="button" data-add="@p.ProductId" data-name="@p.Name"
+                data-price="@p.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-image="@p.ImageUrl"
+                disabled="@(p.StockQuantity <= 0)" aria-label="Thêm @p.Name vào giỏ">+</button>
+    </div>
+    <div class="product-info">
+        <div class="product-meta">
+            <h3><button type="button" data-product-open="@p.ProductId" class="product-title">@p.Name</button></h3>
+            <span class="product-price">@p.Price.ToString("N0") ₫</span>
+        </div>
+        <p>@p.Description</p>
+        <div class="product-card-bottom">
+            <span class="stock-badge @(p.StockQuantity > 5 ? "stock-in" : "stock-low")">
+                @(p.StockQuantity > 5 ? "Còn hàng" : p.StockQuantity > 0 ? $"Còn {p.StockQuantity} sản phẩm" : "Tạm hết hàng")
+            </span>
+            <button type="button" data-product-open="@p.ProductId" class="text-link product-detail-link">Xem chi tiết →</button>
+        </div>
+    </div>
+</article>

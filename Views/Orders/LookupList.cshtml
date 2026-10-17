@@ -1,0 +1,114 @@
+@model IEnumerable<LTW09.Models.ShopOrder>
+@{
+    ViewData["Title"] = "Đơn hàng của bạn — Lá & Nụ";
+    var phone = ViewBag.Phone as string;
+
+    string StatusLabel(string s) => s switch {
+        "Pending"   => "Chờ xác nhận",
+        "Confirmed" => "Đã xác nhận",
+        "Preparing" => "Đang chuẩn bị",
+        "Shipping"  => "Đang giao hoa",
+        "Completed" => "Giao thành công",
+        "Cancelled" => "Đã hủy",
+        _ => s
+    };
+    string StatusColor(string s) => s switch {
+        "Pending"   => "#e65100",
+        "Confirmed" => "#1565c0",
+        "Preparing" => "#6a1b9a",
+        "Shipping"  => "#00695c",
+        "Completed" => "#2e7d32",
+        "Cancelled" => "#999",
+        _ => "var(--muted)"
+    };
+    string StatusIcon(string s) => s switch {
+        "Pending"   => "🕐",
+        "Confirmed" => "✅",
+        "Preparing" => "💐",
+        "Shipping"  => "🚚",
+        "Completed" => "🎉",
+        "Cancelled" => "✕",
+        _ => "·"
+    };
+}
+
+<section style="background:var(--cream);padding:3.5rem 0;min-height:70vh;">
+    <div class="container" style="max-width:620px;">
+
+        <div style="text-align:center;margin-bottom:2rem;">
+            <span style="color:var(--rose);font-size:2rem;">✿</span>
+            <p class="section-label" style="margin:.5rem 0 .2rem;">KẾT QUẢ TRA CỨU</p>
+            <h1 style="font-size:1.9rem;margin:0 0 .4rem;">Đơn hàng của bạn</h1>
+            <p style="color:var(--muted);font-size:.84rem;margin:0;">
+                Tìm thấy <strong>@Model.Count()</strong> đơn hàng với số điện thoại
+                <strong>@phone</strong>
+            </p>
+        </div>
+
+        <div style="display:grid;gap:1rem;margin-bottom:1.5rem;">
+            @foreach (var order in Model)
+            {
+                <div style="background:var(--paper);border:1px solid var(--line);
+                            padding:1.2rem 1.5rem;display:grid;
+                            grid-template-columns:1fr auto;gap:.8rem;align-items:center;">
+                    <div>
+                        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;">
+                            <span style="font-size:1rem;">@StatusIcon(order.Status)</span>
+                            <strong style="font-family:'Playfair Display',serif;font-size:1rem;">
+                                @order.OrderCode
+                            </strong>
+                            <span style="font-size:.7rem;font-weight:700;
+                                         color:@StatusColor(order.Status);">
+                                @StatusLabel(order.Status)
+                            </span>
+                        </div>
+                        <div style="font-size:.78rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap;">
+                            <span>📅 @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                            <span>💰 @order.TotalAmount.ToString("N0") ₫</span>
+                            @if (order.DeliveryDate.HasValue)
+                            {
+                                <span>🚚 Giao @order.DeliveryDate.Value.ToString("dd/MM/yyyy")</span>
+                            }
+                        </div>
+                        <div style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">
+                            📍 @order.DeliveryAddress
+                        </div>
+                    </div>
+                    <div>
+                        @* Form POST để tra cứu đơn cụ thể từ danh sách *@
+                        <form method="post" asp-action="Lookup" asp-controller="Orders">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="orderCode" value="@order.OrderCode" />
+                            <input type="hidden" name="phone" value="@phone" />
+                            <button type="submit" class="btn btn-petal"
+                                    style="padding:.5rem .85rem;font-size:.72rem;white-space:nowrap;">
+                                Xem chi tiết →
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div style="display:flex;gap:.8rem;flex-wrap:wrap;">
+            <a asp-action="Lookup" asp-controller="Orders"
+               class="btn btn-petal" style="text-decoration:none;">
+                ← Tra cứu lại
+            </a>
+            <a href="/" class="btn"
+               style="border:1px solid var(--line);padding:.82rem 1.12rem;
+                      font-size:.76rem;text-decoration:none;">
+                Về trang chủ
+            </a>
+        </div>
+
+        <p style="text-align:center;margin-top:1.3rem;font-size:.76rem;color:var(--muted);">
+            Có thắc mắc?
+            <a href="tel:0378389006"
+               style="color:var(--leaf);font-weight:600;text-decoration:none;">
+                Gọi 037 838 9006
+            </a>
+        </p>
+
+    </div>
+</section>

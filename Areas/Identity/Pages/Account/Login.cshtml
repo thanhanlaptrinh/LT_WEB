@@ -1,0 +1,39 @@
+@page
+@model LTW09.Areas.Identity.Pages.Account.LoginModel
+@using Microsoft.Extensions.Hosting
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@{ Layout = "/Views/Shared/_Layout.cshtml"; ViewData["Title"] = "Đăng nhập — Lá & Nụ"; }
+<section class="auth-section">
+    <div class="auth-card">
+        <p class="section-label">LÁ & NỤ · TÀI KHOẢN</p>
+        <h1>Chào bạn trở lại.</h1>
+        <p class="auth-intro">Đăng nhập để theo dõi đơn hoa và gửi trao những điều dịu dàng.</p>
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div><label asp-for="Input.Email">Email</label>
+                <input asp-for="Input.Email" type="email" class="form-control" autocomplete="username" required />
+                <span asp-validation-for="Input.Email"></span></div>
+            <div><label asp-for="Input.Password">Mật khẩu</label>
+                <div class="auth-password"><input asp-for="Input.Password" class="form-control" autocomplete="current-password" required />
+                    <button type="button" data-toggle-password="Input_Password" aria-label="Hiện mật khẩu" aria-pressed="false">Hiện</button></div>
+                <span asp-validation-for="Input.Password"></span></div>
+            <label class="auth-remember"><input asp-for="Input.RememberMe" /> Ghi nhớ đăng nhập</label>
+            <button class="btn btn-petal w-100" type="submit">Đăng nhập →</button>
+        </form>
+        <p class="auth-switch">Chưa có tài khoản? <a asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl">Đăng ký</a></p>
+        @if (HostEnvironment.IsDevelopment())
+        {
+            <details class="auth-demo"><summary>Tài khoản mẫu để demo đồ án</summary>
+                <p>Chọn để điền nhanh, sau đó nhấn Đăng nhập.</p>
+                <div class="auth-demo-buttons">
+                    <button type="button" data-demo-email="admin@@lanu.vn" data-demo-password="Admin@@123">Admin</button>
+                    <button type="button" data-demo-email="nhanvien1@@lanu.vn" data-demo-password="Staff@@123">Nhân viên 1</button>
+                    <button type="button" data-demo-email="nhanvien2@@lanu.vn" data-demo-password="Staff@@123">Nhân viên 2</button>
+                    <button type="button" data-demo-email="khach1@@lanu.vn" data-demo-password="Customer@@123">Khách hàng 1</button>
+                    <button type="button" data-demo-email="khach2@@lanu.vn" data-demo-password="Customer@@123">Khách hàng 2</button>
+                </div>
+            </details>
+        }
+    </div>
+</section>
+@section Scripts { <script src="~/js/auth.js" asp-append-version="true"></script> }

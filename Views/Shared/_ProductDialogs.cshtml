@@ -1,0 +1,44 @@
+<dialog id="product-dialog" class="product-dialog" aria-labelledby="detail-title">
+    <button type="button" class="dialog-close" data-close-dialog aria-label="Đóng chi tiết sản phẩm">×</button>
+    <div id="detail-loading" class="dialog-state" role="status">Đang tải mẫu hoa…</div>
+    <div id="detail-content" hidden>
+        <div class="detail-grid">
+            <div class="detail-photo"><img id="detail-image" src="/assets/tulips.jpg" alt="" /></div>
+            <div class="detail-copy">
+                <p class="section-label" id="detail-category"></p><h2 id="detail-title" tabindex="-1">Chi tiết mẫu hoa</h2>
+                <button type="button" class="detail-rating-link" id="detail-rating-link">Xem đánh giá</button>
+                <p class="detail-price" id="detail-price"></p><p id="detail-description"></p><p id="detail-stock"></p>
+                <div class="detail-quantity"><label for="detail-quantity">Số lượng</label><input id="detail-quantity" type="number" min="1" max="100" value="1" /></div>
+                <div class="detail-actions">
+                    <button type="button" id="detail-add" class="btn btn-petal">Thêm vào giỏ</button>
+                    <button type="button" id="detail-buy" class="btn btn-buy">Mua ngay →</button>
+                    <button type="button" id="detail-favorite" class="btn btn-favorite" aria-pressed="false">♡ Yêu thích</button>
+                </div>
+                <p class="detail-feedback" id="detail-feedback" role="status"></p>
+                <small>Miễn phí giao hàng cho đơn từ 500.000 ₫. Giá và tồn kho được xác nhận khi đặt hàng.</small>
+            </div>
+        </div>
+        <section class="detail-reviews" id="detail-reviews" aria-labelledby="review-heading">
+            <div class="review-heading"><div><p class="section-label">TRẢI NGHIỆM VỚI MẪU HOA</p><h3 id="review-heading">Đánh giá sản phẩm</h3></div><p id="review-summary"></p></div>
+            <div id="review-filters" class="review-filters" aria-label="Lọc đánh giá theo số sao"></div>
+            <div id="review-list" aria-live="polite"></div>
+            <button type="button" id="review-more" class="text-link" hidden>Xem thêm đánh giá</button>
+            <div id="review-login" class="review-login" hidden><a href="/Identity/Account/Login?returnUrl=/Home/New">Đăng nhập</a> để viết đánh giá.</div>
+            <form id="review-form" class="review-form" method="post" hidden>
+                @Html.AntiForgeryToken()
+                <h4>Đánh giá của bạn</h4>
+                <p>Mỗi tài khoản có một đánh giá cho mẫu hoa; gửi lại để cập nhật nội dung.</p>
+                <div class="review-form-row"><label>Tên hiển thị<input name="DisplayName" class="form-control" maxlength="80" required /></label>
+                    <label>Chấm điểm<select name="Stars" class="form-select" required><option value="5">5 sao — Rất hài lòng</option><option value="4">4 sao — Hài lòng</option><option value="3">3 sao — Bình thường</option><option value="2">2 sao — Chưa hài lòng</option><option value="1">1 sao — Không hài lòng</option></select></label></div>
+                <label>Nhận xét<textarea name="Comment" class="form-control" rows="3" maxlength="2000" required placeholder="Chia sẻ cảm nhận của bạn về mẫu hoa…"></textarea></label>
+                <button type="submit" class="btn btn-petal">Gửi đánh giá</button><p id="review-feedback" role="status"></p>
+            </form>
+        </section>
+    </div>
+</dialog>
+<dialog id="favorites-dialog" class="favorites-dialog" aria-labelledby="favorites-title">
+    <button type="button" class="dialog-close" data-close-dialog aria-label="Đóng danh sách yêu thích">×</button>
+    <p class="section-label">GÓC HOA CỦA BẠN</p><h2 id="favorites-title">Mẫu hoa yêu thích</h2>
+    <p class="favorites-note">Lưu trên trình duyệt này để bạn dễ tìm lại.</p>
+    <div id="favorites-list" aria-live="polite"></div>
+</dialog>

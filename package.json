@@ -1,0 +1,13 @@
+{
+  "name": "la-va-nu-flower-shop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website cửa hàng hoa tươi Lá & Nụ xây dựng trên ASP.NET Core MVC, HTML, CSS và JavaScript.",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx --yes serve . -l ${PORT:-3000}"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

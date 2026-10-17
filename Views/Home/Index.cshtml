@@ -1,0 +1,210 @@
+@model IEnumerable<LTW09.Models.Product>
+@{
+    ViewData["Title"] = "Lá & Nụ — Tiệm hoa tươi nghệ thuật & Giao hoa tận nơi";
+    ViewData["Description"] = "Hoa tươi tuyển chọn mỗi ngày, thiết kế bó hoa theo yêu cầu, giao nhanh 2 giờ tại TP.HCM.";
+    var featured = Model.Where(p => p.IsFeatured).Take(8).ToList();
+    if (!featured.Any()) featured = Model.Take(8).ToList();
+}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container hero-content">
+        <div class="hero-copy">
+            <p class="kicker">Hoa tươi mỗi ngày · Gói trọn tâm tình</p>
+            <h1>Một bó hoa,<br /><em>ngàn lời thương.</em></h1>
+            <p class="hero-lede">
+                Những mùa hoa đẹp nhất được tuyển chọn và kết thành món quà chứa chan cảm xúc, dành riêng cho người bạn trân quý nhất.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a class="btn btn-petal" href="/Home/New">
+                    Khám phá bộ sưu tập mới <span>↗</span>
+                </a>
+                <a class="hero-quiet" href="#featured-products">
+                    Xem hoa bán chạy nhất ↓
+                </a>
+            </div>
+            <div class="hero-proof">
+                <span>✳</span> 100% Hoa nhập mới mỗi sáng <span class="proof-divider">·</span> Giao hỏa tốc 2 giờ <span class="proof-divider">·</span> Miễn phí thiệp viết tay
+            </div>
+        </div>
+        <div class="hero-art">
+            <img src="/assets/tulips.jpg" alt="Bó hoa tulip hồng tươi cao cấp" />
+            <span class="hero-sticker">Gửi một<br />chút dịu dàng</span>
+        </div>
+    </div>
+    <div class="hero-bottomline">
+        <span>HOA TƯƠI · THIẾT KẾ NGHỆ THUẬT · GIAO TẬN NƠI</span>
+        <span>EST. 2024 — SÀI GÒN</span>
+    </div>
+</section>
+
+<!-- Service Promise Strip -->
+<section class="promise-strip">
+    <div class="container promise-grid">
+        <div>
+            <b>01</b>
+            <span>Hoa tươi nhập mới trong ngày</span>
+        </div>
+        <div>
+            <b>02</b>
+            <span>Thiết kế theo yêu cầu riêng</span>
+        </div>
+        <div>
+            <b>03</b>
+            <span>Giao nhanh 2h đúng hẹn</span>
+        </div>
+        <div>
+            <b>04</b>
+            <span>Tặng thiệp viết tay & banner</span>
+        </div>
+    </div>
+</section>
+
+<!-- Featured & Best Seller Products -->
+<section id="featured-products" class="section collection-section">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <p class="section-label">GÓC HOA ĐƯỢC YÊU THÍCH NHẤT</p>
+                <h2>Mẫu hoa bán chạy</h2>
+            </div>
+            <div class="text-end">
+                <a href="/Home/New" class="btn btn-sm btn-petal" style="font-size:.72rem;">
+                    Xem tất cả mẫu mới ↗
+                </a>
+            </div>
+        </div>
+
+        <div class="shop-controls">
+            <div class="filter-list" role="group" aria-label="Lọc nhanh hoa">
+                <button type="button" class="filter-chip active" data-filter="all" aria-pressed="true">Tất cả mẫu tuyển chọn</button>
+                <button type="button" class="filter-chip" data-filter="bouquet" aria-pressed="false">Bó hoa tươi</button>
+                <button type="button" class="filter-chip" data-filter="flower-box" aria-pressed="false">Hộp hoa cao cấp</button>
+                <button type="button" class="filter-chip" data-filter="seasonal" aria-pressed="false">Hoa theo mùa</button>
+            </div>
+            <label class="search-box">
+                <span>⌕</span>
+                <input id="product-search" type="search" placeholder="Tìm tên hoa hoặc loại hoa..." aria-label="Tìm sản phẩm" />
+            </label>
+        </div>
+
+        <div id="product-grid" class="product-grid" aria-live="polite">
+            @foreach (var p in featured)
+            {
+                @await Html.PartialAsync("_ProductCard", p)
+            }
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="catalog-note mb-3">Bạn đang xem danh sách hoa tiêu biểu của tiệm Lá & Nụ.</p>
+            <a href="/Home/New" class="btn btn-petal px-4 py-2">
+                Xem toàn bộ bộ sưu tập hoa & sự kiện sắp tới ↗
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Event / Banner Section -->
+<section class="custom-banner">
+    <div class="container custom-inner">
+        <div>
+            <p class="section-label">DỊP ĐẶC BIỆT SẮP TỚI · THÁNG 10</p>
+            <h2>Trao gửi yêu thương<br /><em>ngày Phụ nữ Việt Nam 20/10.</em></h2>
+            <p>
+                Dành tặng những người phụ nữ tuyệt vời nhất trong cuộc đời bạn: người mẹ tảo tần, người vợ hiền thục, người thương dịu dàng và những đồng nghiệp thân thương.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+                <a class="btn btn-petal" href="/Home/New?tag=20-10">
+                    Bộ sưu tập hoa 20/10 ↗
+                </a>
+                <a class="hero-quiet align-self-center" href="/Home/New?tag=Sale">
+                    Xem ưu đãi giảm giá
+                </a>
+            </div>
+        </div>
+        <img src="/assets/pink-bouquet.jpg" alt="Bó hoa chúc mừng ngày phụ nữ 20/10" />
+    </div>
+</section>
+
+<!-- 5-Star Customer Reviews -->
+<section class="section" style="background:var(--cream);padding:5rem 0;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-label">ĐÁNH GIÁ TỪ KHÁCH HÀNG</p>
+            <h2>Trải nghiệm 5 sao từ người yêu hoa</h2>
+            <p style="color:var(--muted);font-size:.85rem;max-width:540px;margin:.6rem auto 0;">
+                Hơn 2.000 khách hàng đã tin tưởng lựa chọn Lá & Nụ để trao gửi thông điệp yêu thương mỗi ngày.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="review-card">
+                    <div>
+                        <div class="stars">★★★★★</div>
+                        <p style="font-size:.84rem;color:#4a5448;line-height:1.6;margin:0;">
+                            “Bó tulip Nắng Đầu Mùa nhận được hoa rất tươi và đều cánh. Thiệp viết tay nét chữ nắn nót rất đẹp, bạn gái mình thích lắm. Shipper giao đúng giờ hẹn!”
+                        </p>
+                    </div>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">LA</div>
+                        <div class="reviewer-info">
+                            <h4>Chị Lan Anh</h4>
+                            <span>Quận 1, TP. Hồ Chí Minh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="review-card">
+                    <div>
+                        <div class="stars">★★★★★</div>
+                        <p style="font-size:.84rem;color:#4a5448;line-height:1.6;margin:0;">
+                            “Mình đặt gấp hộp hoa mừng khai trương đối tác trong 2 tiếng mà tiệm cắm rất chỉn chu, chụp ảnh duyệt trước khi đi giao. Dịch vụ chuyên nghiệp 10/10.”
+                        </p>
+                    </div>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">MT</div>
+                        <div class="reviewer-info">
+                            <h4>Anh Minh Trí</h4>
+                            <span>Quận Phú Nhuận, TP. Hồ Chí Minh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="review-card">
+                    <div>
+                        <div class="stars">★★★★★</div>
+                        <p style="font-size:.84rem;color:#4a5448;line-height:1.6;margin:0;">
+                            “Hoa hồng Ohara thơm dịu nhẹ, chưng ở phòng khách 5 ngày vẫn còn tươi. Giá cả hợp lý so với chất lượng hoa nhập. Nhất định sẽ ủng hộ tiệm lâu dài.”
+                        </p>
+                    </div>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">MP</div>
+                        <div class="reviewer-info">
+                            <h4>Chị Mai Phương</h4>
+                            <span>Quận Tân Bình, TP. Hồ Chí Minh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Brand Story -->
+<section class="section story-section">
+    <div class="container story-inner">
+        <span class="story-flower">✿</span>
+        <p class="section-label">CHUYỆN CỦA LÁ & NỤ</p>
+        <h2>Hoa đẹp nhất là hoa<br />được trao <em>đúng lúc.</em></h2>
+        <p>
+            Lá & Nụ bắt đầu từ một góc phố nhỏ tại Sài Gòn và niềm tin rằng những đóa hoa tươi có thể sưởi ấm tâm hồn và kết nối mọi trái tim. Chúng mình chọn hoa mỗi sớm mai, chăm chút từng cành lá, thắt từng nút nơ để món quà đến tay người nhận luôn trọn vẹn nhất.
+        </p>
+        <a href="/Home/New" class="text-link">Khám phá bộ sưu tập hoa <span>↗</span></a>
+    </div>
+</section>
+

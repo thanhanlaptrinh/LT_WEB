@@ -1,0 +1,27 @@
+@page
+@model LTW09.Areas.Identity.Pages.Account.RegisterModel
+@{ Layout = "/Views/Shared/_Layout.cshtml"; ViewData["Title"] = "Đăng ký — Lá & Nụ"; }
+<section class="auth-section">
+    <div class="auth-card">
+        <p class="section-label">LÁ & NỤ · KHÁCH HÀNG MỚI</p>
+        <h1>Thêm một kết nối.</h1>
+        <p class="auth-intro">Tạo tài khoản để đặt hoa và xem lịch sử đơn hàng của bạn.</p>
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div><label asp-for="Input.Email">Email</label><input asp-for="Input.Email" type="email" class="form-control" autocomplete="username" required />
+                <span asp-validation-for="Input.Email"></span></div>
+            <div><label asp-for="Input.PhoneNumber">Số điện thoại</label><input asp-for="Input.PhoneNumber" type="tel" class="form-control" autocomplete="tel" pattern="0[0-9]{9}" required />
+                <span asp-validation-for="Input.PhoneNumber"></span></div>
+            <div><label asp-for="Input.Password">Mật khẩu</label>
+                <div class="auth-password"><input asp-for="Input.Password" class="form-control" autocomplete="new-password" minlength="6" required />
+                    <button type="button" data-toggle-password="Input_Password" aria-label="Hiện mật khẩu" aria-pressed="false">Hiện</button></div>
+                <small>Tối thiểu 6 ký tự, có ít nhất một chữ thường.</small>
+                <span asp-validation-for="Input.Password"></span></div>
+            <div><label asp-for="Input.ConfirmPassword">Nhập lại mật khẩu</label><input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" minlength="6" required />
+                <span asp-validation-for="Input.ConfirmPassword"></span></div>
+            <button class="btn btn-petal w-100" type="submit">Tạo tài khoản →</button>
+        </form>
+        <p class="auth-switch">Đã có tài khoản? <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Đăng nhập</a></p>
+    </div>
+</section>
+@section Scripts { <script src="~/js/auth.js" asp-append-version="true"></script> }

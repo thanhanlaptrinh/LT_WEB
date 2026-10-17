@@ -1,0 +1,18 @@
+[
+  {"id":1,"name":"Nắng Đầu Mùa","description":"Tulip hồng pastel phối baby Hà Lan và lá bạc thanh tao.","category":"bouquet","label":"Bán chạy","price":590000,"image":"/assets/tulips.jpg","stock":15},
+  {"id":2,"name":"Thương Gửi Nàng","description":"Hồng Ohara kem phấn, cát tường trắng và thạch thảo tím mộng mơ.","category":"bouquet","label":"Lễ 20/10","price":750000,"image":"/assets/pink-bouquet.jpg","stock":12},
+  {"id":3,"name":"Mộng Mơ Tháng Tư","description":"Hộp hoa nhung tròn phối hoa hồng Ecuador và cẩm tú cầu lam biếc.","category":"flower-box","label":"Mới","price":890000,"image":"/assets/roses.jpg","stock":8},
+  {"id":4,"name":"Một Ngày Rực Rỡ","description":"Đồng tiền vàng cam, hướng dương mặt trời và cúc tana dịu dàng.","category":"bouquet","label":"Sinh nhật","price":490000,"image":"/assets/mixed-flowers.jpg","stock":20},
+  {"id":5,"name":"Dịu Dàng Sắc Xuân","description":"Mẫu đơn hồng kem kết hợp lan hồ điệp mini và lá phụ cao cấp.","category":"flower-box","label":"Giảm giá 15%","price":680000,"image":"/assets/peony.jpg","stock":6},
+  {"id":6,"name":"Lời Yêu Xanh","description":"Tulip kép trắng tuyết, lan vũ nữ vàng và cỏ đồng nội bay bổng.","category":"bouquet","label":"Số lượng có hạn","price":820000,"image":"/assets/spring.jpg","stock":4},
+  {"id":7,"name":"Chớm Nở Yêu Thương","description":"Cẩm chướng đỏ tươi phối cúc mẫu đơn và lá chanh Đà Lạt.","category":"seasonal","label":"Hoa theo mùa","price":450000,"image":"/assets/seasonal.jpg","stock":14},
+  {"id":8,"name":"Bình Yên Nơi Phố Thị","description":"Hoa tone trắng kem tinh khôi, hoa hồng mỡ gà và sao tím.","category":"flower-box","label":"Khai trương","price":720000,"image":"/assets/white-bouquet.jpg","stock":9},
+  {"id":9,"name":"Hạnh Phúc Đong Đầy","description":"Giỏ hoa gỗ vintage cắm tràn hoa hồng Spirit cam và lan mokara.","category":"flower-basket","label":"Sinh nhật","price":650000,"image":"/assets/mixed-flowers.jpg","stock":7},
+  {"id":10,"name":"Bình Hoa Thanh Khiết","description":"Bình gốm mộc cắm hoa cúc mẫu đơn trắng, tú cầu và phi yến xanh.","category":"vase","label":"Mới","price":950000,"image":"/assets/white-bouquet.jpg","stock":5},
+  {"id":11,"name":"Ngọt Ngào Tình Nồng","description":"99 đóa hồng đỏ Pháp bó giấy đen viền vàng hoàng gia sang trọng.","category":"bouquet","label":"Lễ 20/10","price":1450000,"image":"/assets/roses.jpg","stock":3},
+  {"id":12,"name":"Khai Trương Hồng Phát","description":"Giỏ hoa tone đỏ vàng may mắn phối hồng môn và thiên điểu rực rỡ.","category":"flower-basket","label":"Khai trương","price":1150000,"image":"/assets/spring.jpg","stock":8},
+  {"id":13,"name":"Thảo Nguyên Xanh Biếc","description":"Cúc tana đồng nội kết hợp hoa baby trắng tinh khiết như mây trời.","category":"seasonal","label":"Bán chạy","price":380000,"image":"/assets/tulips.jpg","stock":25},
+  {"id":14,"name":"Ánh Dương Ngày Mới","description":"Bó hoa hướng dương 5 bông to phối cúc calimero và lá đuôi chồn.","category":"bouquet","label":"Sinh nhật","price":420000,"image":"/assets/mixed-flowers.jpg","stock":18},
+  {"id":15,"name":"Trái Tim Mùa Thu","description":"Hộp hoa trái tim xếp hoa hồng cam đào cappuccino và socola Ferrero.","category":"flower-box","label":"Giảm giá 20%","price":790000,"image":"/assets/pink-bouquet.jpg","stock":2},
+  {"id":16,"name":"Lan Hồ Điệp Hoàng Gia","description":"Chậu lan hồ điệp 3 cành tím vân sang trọng, tài lộc thịnh vượng.","category":"vase","label":"Khai trương","price":1200000,"image":"/assets/peony.jpg","stock":5}
+]

@@ -1,0 +1,133 @@
+@model LTW09.Models.ShopOrder
+@{
+    ViewData["Title"] = "Đặt hoa thành công — Lá & Nụ";
+}
+
+<section class="section" style="background:var(--paper);min-height:75vh;padding-top:4rem;">
+    <div class="container" style="max-width:680px;text-align:center;">
+        <span style="color:var(--rose);font-size:3.5rem;display:block;margin-bottom:1rem;">✿</span>
+        <p class="section-label">ĐẶT HOA THÀNH CÔNG</p>
+        <h1 style="font-size:clamp(2rem,4vw,3rem);margin-bottom:.75rem;">
+            Cảm ơn bạn đã tin chọn Lá & Nụ!
+        </h1>
+        <p style="color:var(--muted);font-size:.92rem;margin-bottom:2rem;">
+            Đơn hoa của bạn đã được tiếp nhận. Đội ngũ Florist sẽ liên hệ xác nhận trong vòng 15-30 phút để chuẩn bị bó hoa tươi đẹp nhất gửi tới người thương.
+        </p>
+
+        <div style="background:var(--sage);padding:1.5rem 2rem;text-align:left;margin-bottom:2rem;border:1px solid #d8e2d6;">
+            <p class="section-label" style="margin-bottom:1rem;color:var(--leaf);">CHI TIẾT ĐƠN HÀNG</p>
+
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                <span style="color:var(--muted);">Mã đơn hàng</span>
+                <strong style="color:var(--leaf);font-family:'Playfair Display',serif;font-size:1.05rem;">@Model.OrderCode</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                <span style="color:var(--muted);">Người nhận</span>
+                <strong>@Model.RecipientName</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                <span style="color:var(--muted);">Số điện thoại</span>
+                <span>@Model.RecipientPhone</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                <span style="color:var(--muted);">Địa chỉ nhận hoa</span>
+                <span style="text-align:right;max-width:340px;font-weight:600;">@Model.DeliveryAddress</span>
+            </div>
+            @if (Model.DeliveryDate.HasValue)
+            {
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                    <span style="color:var(--muted);">Ngày giao hoa</span>
+                    <span>@Model.DeliveryDate.Value.ToString("dd/MM/yyyy")</span>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.CardMessage))
+            {
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                    <span style="color:var(--muted);">Lời nhắn thiệp</span>
+                    <span style="text-align:right;max-width:320px;color:var(--rose);font-style:italic;">“@Model.CardMessage”</span>
+                </div>
+            }
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:.6rem 0;font-size:.84rem;">
+                <span style="color:var(--muted);">Phương thức thanh toán</span>
+                <span>@(Model.PaymentMethod == "BankTransfer" ? "Chuyển khoản ngân hàng (VietQR)" : "Tiền mặt khi nhận hoa (COD)")</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:.6rem 0 0;font-size:.84rem;">
+                <span style="color:var(--muted);">Trạng thái đơn</span>
+                <span class="stock-badge stock-low">Chờ xác nhận</span>
+            </div>
+        </div>
+
+        @if (Model.PaymentMethod == "BankTransfer")
+        {
+            <div class="p-3 mb-4 text-start bg-white border" style="font-size:.82rem;">
+                <strong style="color:var(--leaf);display:block;margin-bottom:.4rem;">💳 Hướng dẫn thanh toán chuyển khoản:</strong>
+                <div>Ngân hàng: <strong>Vietcombank</strong> (Chi nhánh TP.HCM)</div>
+                <div>Số tài khoản: <code>1029384756</code> — Chủ TK: <strong>LÁ VÀ NỤ FLOWER STUDIO</strong></div>
+                <div>Số tiền cần chuyển: <strong style="color:var(--leaf);">@Model.TotalAmount.ToString("N0") ₫</strong></div>
+                <div>Cú pháp chuyển khoản: <code>@Model.OrderCode - @Model.RecipientPhone</code></div>
+            </div>
+        }
+
+        @if (Model.Items.Any())
+        {
+            <div style="text-align:left;margin-bottom:2rem;">
+                <p class="section-label" style="margin-bottom:1rem;">DANH SÁCH MẪU HOA ĐÃ CHỌN</p>
+                @foreach (var item in Model.Items)
+                {
+                    <div style="display:grid;grid-template-columns:54px 1fr auto;gap:.7rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line);">
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.ProductName" style="width:54px;height:58px;object-fit:cover;border:1px solid var(--line);" />
+                        }
+                        else
+                        {
+                            <div style="width:54px;height:58px;background:var(--sage);"></div>
+                        }
+                        <div>
+                            <div style="font-size:.84rem;font-weight:600;">@item.ProductName</div>
+                            <div style="font-size:.7rem;color:var(--muted);">@item.Quantity.ToString("N0") × @item.UnitPrice.ToString("N0") ₫</div>
+                        </div>
+                        <strong style="font-size:.82rem;color:var(--leaf);">@item.LineTotal.ToString("N0") ₫</strong>
+                    </div>
+                }
+
+                <div style="display:flex;justify-content:space-between;padding:.6rem 0;font-size:.84rem;border-bottom:1px solid var(--line);">
+                    <span style="color:var(--muted);">Tạm tính</span>
+                    <span>@Model.Subtotal.ToString("N0") ₫</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:.6rem 0;font-size:.84rem;border-bottom:1px solid var(--line);">
+                    <span style="color:var(--muted);">Phí giao hàng</span>
+                    <span>@(Model.DeliveryFee == 0 ? "Miễn phí" : Model.DeliveryFee.ToString("N0") + " ₫")</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:.75rem 0;font-size:1.1rem;font-weight:700;">
+                    <span>Tổng thanh toán</span>
+                    <strong style="color:var(--leaf);">@Model.TotalAmount.ToString("N0") ₫</strong>
+                </div>
+            </div>
+        }
+
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+            <a href="/" class="btn btn-petal">← Về trang chủ</a>
+            <a href="/Home/New" class="btn" style="border:1px solid var(--line);padding:.82rem 1.12rem;font-size:.76rem;text-decoration:none;">
+                Xem thêm hoa khác ↗
+            </a>
+            <form method="post" asp-action="Lookup" asp-controller="Orders" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderCode" value="@Model.OrderCode" />
+                <input type="hidden" name="phone" value="@Model.RecipientPhone" />
+                <button type="submit" class="btn btn-outline-dark" style="border-radius:0;font-size:.76rem;padding:.82rem 1.12rem;">
+                    Tra cứu tiến độ đơn này 🔍
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Xóa giỏ hàng sau khi đặt hàng thành công
+    try { localStorage.removeItem('laNuCart'); } catch {}
+    const countEl = document.querySelector('#cart-count');
+    if (countEl) countEl.textContent = '0';
+</script>
+}

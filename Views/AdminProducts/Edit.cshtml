@@ -1,0 +1,25 @@
+@model LTW09.ViewModels.ProductFormViewModel
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+}
+
+<section class="section" style="background:var(--paper);min-height:80vh;">
+    <div class="container" style="max-width:680px;">
+        <p class="section-label">QUẢN TRỊ → SẢN PHẨM</p>
+        <h1 style="font-size:2rem;margin-bottom:1.5rem;">Sửa sản phẩm</h1>
+
+        <form method="post" asp-action="Edit" asp-controller="AdminProducts"
+              asp-route-id="@Model.ProductId" novalidate>
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ProductId" />
+            @await Html.PartialAsync("_ProductFormFields", Model)
+
+            <div style="display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;">
+                <button type="submit" class="btn btn-petal">Lưu thay đổi</button>
+                <a asp-action="Index" class="btn" style="border:1px solid var(--line);padding:.82rem 1.12rem;font-size:.76rem;">← Hủy</a>
+                <a asp-action="Inventory" asp-route-id="@Model.ProductId"
+                   style="font-size:.78rem;color:var(--muted);align-self:center;margin-left:auto;">Xem lịch sử kho →</a>
+            </div>
+        </form>
+    </div>
+</section>

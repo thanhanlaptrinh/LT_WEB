@@ -1,0 +1,58 @@
+@model IEnumerable<LTW09.Models.InventoryMovement>
+@{
+    var product = ViewBag.Product as LTW09.Models.Product;
+    ViewData["Title"] = $"Lịch sử kho — {product?.Name}";
+}
+
+<section class="section" style="background:var(--paper);min-height:70vh;">
+    <div class="container" style="max-width:760px;">
+        <p class="section-label">QUẢN TRỊ → SẢN PHẨM → KHO</p>
+        <h1 style="font-size:1.8rem;margin-bottom:.4rem;">@product?.Name</h1>
+        <p style="color:var(--muted);font-size:.84rem;margin-bottom:1.5rem;">
+            Tồn kho hiện tại: <strong style="color:var(--leaf);">@product?.StockQuantity</strong>
+        </p>
+
+        <a asp-action="Edit" asp-route-id="@product?.ProductId"
+           style="font-size:.78rem;color:var(--leaf);font-weight:600;">← Sửa sản phẩm</a>
+        <span style="margin:0 .5rem;color:var(--line);">|</span>
+        <a asp-action="Index" style="font-size:.78rem;color:var(--muted);">Danh sách sản phẩm</a>
+
+        <div style="overflow-x:auto;margin-top:1.5rem;">
+            <table style="width:100%;border-collapse:collapse;font-size:.82rem;">
+                <thead>
+                    <tr style="border-bottom:2px solid var(--line);text-align:left;">
+                        <th style="padding:.6rem .8rem;">Thời gian</th>
+                        <th style="padding:.6rem .8rem;">Loại</th>
+                        <th style="padding:.6rem .8rem;text-align:right;">Thay đổi</th>
+                        <th style="padding:.6rem .8rem;">Mã tham chiếu</th>
+                        <th style="padding:.6rem .8rem;">Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model)
+                    {
+                        <tr style="border-bottom:1px solid var(--line);">
+                            <td style="padding:.5rem .8rem;color:var(--muted);white-space:nowrap;">
+                                @m.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td style="padding:.5rem .8rem;">
+                                <span style="font-size:.72rem;font-weight:600;color:@(m.MovementType == "Sale" || m.MovementType == "Adjustment" && m.QuantityChange < 0 ? "var(--rose)" : "var(--leaf)");">
+                                    @m.MovementType
+                                </span>
+                            </td>
+                            <td style="padding:.5rem .8rem;text-align:right;font-weight:700;color:@(m.QuantityChange >= 0 ? "var(--leaf)" : "var(--rose)");">
+                                @(m.QuantityChange >= 0 ? "+" : "")@m.QuantityChange
+                            </td>
+                            <td style="padding:.5rem .8rem;color:var(--muted);">@(m.ReferenceCode ?? "—")</td>
+                            <td style="padding:.5rem .8rem;color:var(--muted);max-width:240px;">@(m.Note ?? "—")</td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);">Chưa có lịch sử kho.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

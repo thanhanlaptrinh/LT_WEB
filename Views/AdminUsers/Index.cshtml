@@ -1,0 +1,135 @@
+@model IEnumerable<LTW09.ViewModels.AdminUserViewModel>
+@{
+    ViewData["Title"] = "Quản lý tài khoản & Phân quyền — Lá & Nụ Admin";
+    var availableRoles = ViewBag.AvailableRoles as string[] ?? new[] { "Admin", "Nhân viên", "Khách hàng" };
+}
+
+<section class="section" style="background:var(--paper);min-height:75vh;padding-top:3.5rem;">
+    <div class="container" style="max-width:1050px;">
+        <div class="d-flex justify-content-between align-items-end mb-4 pb-2 border-bottom">
+            <div>
+                <p class="section-label" style="color:var(--rose);">KHU VỰC QUẢN TRỊ VIÊN (ADMIN)</p>
+                <h1 style="font-size:2.2rem;margin:0;">Quản lý tài khoản & Phân quyền</h1>
+                <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;">
+                    Hệ thống phân quyền chuẩn 3 vai trò: <strong>Admin (Toàn quyền)</strong>, <strong>Nhân viên (Vận hành đơn & Kho)</strong>, <strong>Khách hàng (Mua hoa & Xem lịch sử)</strong>.
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/AdminProducts" class="btn btn-sm btn-outline-dark" style="border-radius:0;font-size:.75rem;">
+                    📦 Quản lý hoa
+                </a>
+                <a href="/AdminOrders" class="btn btn-sm btn-outline-dark" style="border-radius:0;font-size:.75rem;">
+                    📋 Quản lý đơn hàng
+                </a>
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success p-3 mb-4" style="border-radius:0;background:#e8f5e9;border-left:4px solid #2e7d32;color:#1b5e20;font-size:.84rem;">
+                ✓ @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger p-3 mb-4" role="alert">
+                ⚠ @TempData["Error"]
+            </div>
+        }
+
+        <!-- 3 Role Description Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="p-3 bg-white border" style="border-left:4px solid var(--rose)!important;">
+                    <strong style="color:var(--rose);display:block;font-size:.88rem;margin-bottom:.2rem;">
+                        👑 Quản trị viên (Admin)
+                    </strong>
+                    <p style="font-size:.75rem;color:var(--muted);margin:0;">
+                        Toàn quyền: Thêm, sửa, xóa sản phẩm hoa, điều chỉnh kho, xử lý đơn hàng, quản lý và phân quyền cho mọi tài khoản người dùng.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-white border" style="border-left:4px solid var(--leaf)!important;">
+                    <strong style="color:var(--leaf);display:block;font-size:.88rem;margin-bottom:.2rem;">
+                        🧑‍💼 Nhân viên (Staff)
+                    </strong>
+                    <p style="font-size:.75rem;color:var(--muted);margin:0;">
+                        Xử lý và cập nhật tiến độ đơn hàng (Chờ xác nhận, Đang cắm hoa, Đang giao), kiểm tra tồn kho. Không có quyền quản lý tài khoản.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-white border" style="border-left:4px solid #1976d2!important;">
+                    <strong style="color:#1976d2;display:block;font-size:.88rem;margin-bottom:.2rem;">
+                        🛍️ Khách hàng (Customer)
+                    </strong>
+                    <p style="font-size:.75rem;color:var(--muted);margin:0;">
+                        Đăng nhập tài khoản cá nhân, lưu thông tin giao nhận, xem lịch sử các đơn hàng đã đặt và tra cứu tiến độ hoa.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card border shadow-sm" style="border-radius:0;background:#fff;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size:.82rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:220px;">Email / Tài khoản</th>
+                            <th>Số điện thoại</th>
+                            <th style="width:170px;">Vai trò hiện tại</th>
+                            <th style="width:300px;">Thay đổi quyền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            var roleClass = user.PrimaryRole == "Admin" ? "bg-danger text-white" :
+                                            user.PrimaryRole == "Nhân viên" ? "bg-success text-white" :
+                                            user.PrimaryRole == "Khách hàng" ? "bg-primary text-white" : "bg-secondary text-white";
+
+                            <tr>
+                                <td>
+                                    <strong>@user.Email</strong>
+                                    <div style="font-size:.7rem;color:var(--muted);">ID: @user.Id.Substring(0, Math.Min(12, user.Id.Length))...</div>
+                                </td>
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(user.PhoneNumber) ? "(Chưa cập nhật)" : user.PhoneNumber)
+                                </td>
+                                <td>
+                                    <span class="badge @roleClass p-2" style="font-size:.75rem;letter-spacing:.03em;">
+                                        @user.PrimaryRole
+                                    </span>
+                                </td>
+                                <td>
+                                    <form method="post" asp-action="UpdateRole" class="d-flex align-items-center gap-2 m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <select name="newRole" class="form-select form-select-sm py-1" style="font-size:.78rem;">
+                                            @foreach (var r in availableRoles)
+                                            {
+                                                if (user.PrimaryRole == r)
+                                                {
+                                                    <option value="@r" selected>@r (Hiện tại)</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@r">Chuyển sang: @r</option>
+                                                }
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-dark text-nowrap" style="border-radius:0;font-size:.72rem;">
+                                            Cập nhật
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

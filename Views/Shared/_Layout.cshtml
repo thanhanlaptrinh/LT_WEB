@@ -1,0 +1,158 @@
+@{
+    var title = ViewData["Title"] as string ?? "Lá & Nụ — Hoa tươi trao điều dịu dàng";
+    var description = ViewData["Description"] as string ?? "Hoa tươi tuyển chọn, thiết kế bó hoa theo yêu cầu, giao tận nơi.";
+}
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@description" />
+    <meta name="theme-color" content="#fbf8f1" />
+    <title>@title</title>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/flower-shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/storefront.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Bỏ qua điều hướng, đến nội dung chính</a>
+    
+    <header class="site-header" id="top">
+    <div class="announcement">
+        🌸 Tặng thiệp viết tay & banner cho mọi đơn hàng · Giao hoa nhanh 2 giờ tại TP. Hồ Chí Minh
+    </div>
+
+        <nav class="navbar navbar-expand-xl" aria-label="Điều hướng chính">
+            <div class="container py-2">
+                <a class="navbar-brand" href="/" aria-label="Lá & Nụ — Về trang chủ">
+                    <span class="brand-mark" aria-hidden="true">✿</span>
+                    <span>
+                        <span class="brand-name d-block">Lá & Nụ</span>
+                        <span class="brand-meta">FRESH FLOWER STUDIO</span>
+                    </span>
+                </a>
+                <button class="navbar-toggler border-0" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu điều hướng">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="mainNav">
+                    <ul class="navbar-nav gap-lg-3 align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Home/New">Bộ sưu tập mới ✦</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Orders/Lookup">Tra cứu đơn</a>
+                        </li>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="adminMenu"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                   style="color:var(--rose)!important;">
+                                    Quản trị Admin ▾
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="adminMenu" style="border-radius:0;border:1px solid var(--line);">
+                                    <li><a class="dropdown-item py-2" href="/AdminProducts" style="font-size:.82rem;">📦 Quản lý hoa & Tồn kho</a></li>
+                                    <li><a class="dropdown-item py-2" href="/AdminOrders" style="font-size:.82rem;">📋 Xử lý đơn hàng</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item py-2 text-danger" href="/AdminUsers" style="font-size:.82rem;">👥 Phân quyền & Tài khoản</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else if (User.IsInRole("Nhân viên"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="staffMenu"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                   style="color:var(--leaf)!important;font-weight:600;">
+                                    Vận hành tiệm ▾
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="staffMenu" style="border-radius:0;border:1px solid var(--line);">
+                                    <li><a class="dropdown-item py-2" href="/AdminOrders" style="font-size:.82rem;">📋 Xử lý đơn hàng</a></li>
+                                    <li><a class="dropdown-item py-2" href="/AdminProducts" style="font-size:.82rem;">📦 Kiểm tra tồn kho</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else if (User.IsInRole("Khách hàng"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Orders/MyOrders" style="color:var(--leaf)!important;font-weight:600;">
+                                    Đơn hàng của tôi
+                                </a>
+                            </li>
+                        }
+
+                        <li class="nav-item"><button type="button" class="favorites-button" id="open-favorites" aria-haspopup="dialog">♡ Yêu thích <span id="favorites-count">0</span></button></li>
+                        <li class="nav-item">
+                            <button class="cart-button" id="open-cart" type="button"
+                                    aria-haspopup="dialog" aria-controls="cart-drawer">
+                                Giỏ hoa <span id="cart-count" aria-live="polite">0</span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item ms-lg-2">
+                            @await Html.PartialAsync("_LoginPartial")
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer" id="contact">
+        <div class="container footer-main">
+            <div><a class="footer-brand" href="/">✿ Lá & Nụ</a><p>Hoa tươi mỗi ngày, gửi trọn yêu thương.</p></div>
+            <div class="footer-contact"><a href="tel:0909999888">0909 999 888</a><span>18 Nguyễn Văn Trỗi, Phú Nhuận, TP.HCM</span><span>08:00 – 20:00 · Mỗi ngày</span></div>
+            <div class="footer-links"><a href="/Home/New">Bộ sưu tập</a><a href="/Orders/Lookup">Tra cứu đơn</a><a href="#top">Lên đầu trang ↑</a></div>
+        </div>
+        <div class="container footer-bottom">© <span id="current-year"></span> Lá & Nụ · Nhóm 7 · Đề tài 22</div>
+    </footer>
+
+    <!-- Cart Drawer -->
+    <div class="cart-backdrop" id="cart-backdrop" hidden></div>
+    <aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true"
+           aria-label="Giỏ hàng" aria-hidden="true" tabindex="-1">
+        <div class="cart-head">
+            <div>
+                <p class="section-label">ĐƠN HOA CỦA BẠN</p>
+                <h2>Giỏ hàng</h2>
+            </div>
+            <button id="close-cart" class="close-cart" type="button" aria-label="Đóng giỏ hàng">×</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-empty" id="cart-empty">
+            Giỏ hoa của bạn đang trống.<br />
+            Chọn một bó hoa thật xinh cho người thương nhé ✿
+        </div>
+        <div class="cart-foot">
+            <div class="cart-total">
+                <span>Tạm tính</span>
+                <strong id="cart-total">0 ₫</strong>
+            </div>
+            <button id="checkout-button" class="btn btn-petal w-100" type="button">
+                Tiến hành đặt hoa (5 bước) ↗
+            </button>
+            <small>Miễn phí giao hàng cho đơn từ 500.000 ₫.</small>
+        </div>
+    </aside>
+
+    <div class="toast-message" id="toast-message" role="status" aria-live="polite"></div>
+
+    @await Html.PartialAsync("_ProductDialogs")
+
+    <script src="~/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/flower-shop.js" asp-append-version="true"></script>
+    <script src="~/js/storefront.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

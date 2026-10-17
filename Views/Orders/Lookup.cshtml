@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "Tra cứu đơn hàng — Lá & Nụ";
+    var error = ViewBag.Error as string;
+}
+
+<section style="min-height:70vh;display:flex;align-items:center;background:var(--cream);padding:4rem 0;">
+    <div class="container" style="max-width:500px;">
+
+        <div style="text-align:center;margin-bottom:2.5rem;">
+            <span style="color:var(--rose);font-size:2rem;">✿</span>
+            <p class="section-label" style="margin:.6rem 0 .3rem;">THEO DÕI ĐƠN HÀNG</p>
+            <h1 style="font-size:2.2rem;margin:0 0 .5rem;">Tra cứu đơn hoa</h1>
+            <p style="color:var(--muted);font-size:.86rem;margin:0;">
+                Nhập <strong>số điện thoại</strong> người nhận để xem tất cả đơn,
+                hoặc kết hợp thêm <strong>mã đơn</strong> để tìm nhanh hơn.
+            </p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div role="alert"
+                 style="border-left:4px solid var(--rose);background:#fff5f4;
+                        padding:.9rem 1.2rem;margin-bottom:1.5rem;font-size:.84rem;color:var(--rose);">
+                @error
+            </div>
+        }
+
+        <div style="background:var(--paper);padding:2rem 2.2rem;border:1px solid var(--line);">
+            <form method="post" asp-action="Lookup" asp-controller="Orders">
+                @Html.AntiForgeryToken()
+
+                @* Số điện thoại — bắt buộc *@
+                <div style="margin-bottom:1.2rem;">
+                    <label for="phone"
+                           style="display:block;font-size:.72rem;font-weight:700;
+                                  letter-spacing:.1em;text-transform:uppercase;
+                                  margin-bottom:.4rem;color:var(--ink);">
+                        Số điện thoại người nhận
+                        <span style="color:var(--rose);">*</span>
+                    </label>
+                    <input id="phone" name="phone" type="tel"
+                           class="form-control"
+                           style="border-radius:0;border:1px solid var(--line);
+                                  background:var(--cream);font-size:.88rem;padding:.7rem .9rem;"
+                           value="@ViewBag.Phone"
+                           placeholder="090 xxx xxxx"
+                           required />
+                    <small style="color:var(--muted);font-size:.7rem;">
+                        Nhập SĐT để xem tất cả đơn hàng liên quan.
+                    </small>
+                </div>
+
+                @* Mã đơn — tuỳ chọn *@
+                <div style="margin-bottom:1.6rem;">
+                    <label for="orderCode"
+                           style="display:block;font-size:.72rem;font-weight:700;
+                                  letter-spacing:.1em;text-transform:uppercase;
+                                  margin-bottom:.4rem;color:var(--ink);">
+                        Mã đơn hàng
+                        <span style="color:var(--muted);font-weight:400;font-size:.68rem;
+                                     text-transform:none;letter-spacing:0;">(không bắt buộc)</span>
+                    </label>
+                    <input id="orderCode" name="orderCode" type="text"
+                           class="form-control"
+                           style="border-radius:0;border:1px solid var(--line);
+                                  background:var(--cream);font-size:.88rem;padding:.7rem .9rem;
+                                  text-transform:uppercase;letter-spacing:.04em;"
+                           value="@ViewBag.OrderCode"
+                           placeholder="VD: LN20241014123456" />
+                    <small style="color:var(--muted);font-size:.7rem;">
+                        Điền thêm nếu muốn tìm đúng một đơn cụ thể.
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-petal w-100"
+                        style="font-size:.82rem;padding:.85rem;letter-spacing:.05em;">
+                    Tra cứu →
+                </button>
+            </form>
+        </div>
+
+        <p style="text-align:center;margin-top:1.3rem;font-size:.76rem;color:var(--muted);">
+            Cần hỗ trợ?
+            <a href="/#contact" style="color:var(--leaf);font-weight:600;text-decoration:none;">Liên hệ tiệm</a>
+            · hoặc gọi
+            <a href="tel:0378389006" style="color:var(--leaf);font-weight:600;text-decoration:none;">037 838 9006</a>
+        </p>
+        <p style="text-align:center;margin-top:.4rem;font-size:.76rem;">
+            <a href="/" style="color:var(--muted);text-decoration:none;">← Về trang chủ</a>
+        </p>
+
+    </div>
+</section>

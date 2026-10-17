@@ -1,0 +1,130 @@
+@model IEnumerable<LTW09.Models.Product>
+@{
+    ViewData["Title"] = "Bộ sưu tập hoa mới & Sự kiện — Lá & Nụ";
+    ViewData["Description"] = "Khám phá các mẫu hoa mới nhất, bộ sưu tập lễ 20/10, hoa sinh nhật, hoa khai trương và các ưu đãi hấp dẫn.";
+    var currentTag = ViewBag.CurrentTag as string ?? "";
+    var currentCategory = ViewBag.CurrentCategory as string ?? "";
+    var currentSearch = ViewBag.CurrentSearch as string ?? "";
+    var categories = ViewBag.Categories as IEnumerable<LTW09.Models.Category> ?? Enumerable.Empty<LTW09.Models.Category>();
+}
+
+@await Html.PartialAsync("_BestSellerBanner", ViewBag.BestSellers as IEnumerable<LTW09.Models.Product> ?? Enumerable.Empty<LTW09.Models.Product>())
+
+<!-- Gợi ý theo sự kiện & Dịp lễ sắp tới -->
+<section class="section" style="padding:3.5rem 0;background:var(--paper);border-bottom:1px solid var(--line);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <p class="section-label">GỢI Ý THEO DỊP LỄ</p>
+                <h2 style="font-size:2rem;margin:0;">Sự kiện nổi bật sắp tới</h2>
+            </div>
+            <span style="font-size:.78rem;color:var(--muted);">Chọn nhanh theo nhu cầu tặng</span>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <a href="/Home/New?tag=20-10" class="event-card @(currentTag == "20-10" ? "border-danger" : "")">
+                    <span class="event-icon">🌸</span>
+                    <h3>Lễ 20/10</h3>
+                    <p>Tặng Mẹ, Vợ & Người Thương</p>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="/Home/New?tag=Birthday" class="event-card @(currentTag == "Birthday" ? "border-danger" : "")">
+                    <span class="event-icon">🎂</span>
+                    <h3>Sinh Nhật</h3>
+                    <p>Tươi sáng & Rực rỡ tuổi mới</p>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="/Home/New?tag=Opening" class="event-card @(currentTag == "Opening" ? "border-danger" : "")">
+                    <span class="event-icon">🎊</span>
+                    <h3>Khai Trương</h3>
+                    <p>Phát tài phát lộc & Đại cát</p>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a href="/Home/New?tag=Sale" class="event-card @(currentTag == "Sale" ? "border-danger" : "")">
+                    <span class="event-icon">🏷️</span>
+                    <h3>Ưu Đãi Sale</h3>
+                    <p>Giảm đến 20% hôm nay</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Danh mục sản phẩm & Lọc Tag -->
+<section class="section collection-section" style="padding-top:3.5rem;">
+    <div class="container">
+        <!-- Controls & Filter Chips -->
+        <div class="shop-controls flex-wrap">
+            <div class="filter-list" role="group" aria-label="Lọc theo sự kiện và tag">
+                <a href="/Home/New" class="filter-chip @(string.IsNullOrEmpty(currentTag) && string.IsNullOrEmpty(currentCategory) ? "active" : "")">
+                    Tất cả hoa (@Model.Count())
+                </a>
+                <a href="/Home/New?tag=Mới" class="filter-chip @(currentTag == "Mới" ? "active" : "")">
+                    ✨ Mới về
+                </a>
+                <a href="/Home/New?tag=BestSeller" class="filter-chip @(currentTag == "BestSeller" ? "active" : "")">
+                    🔥 Bán chạy
+                </a>
+                <a href="/Home/New?tag=Sale" class="filter-chip @(currentTag == "Sale" ? "active" : "")">
+                    🏷️ Đang giảm giá
+                </a>
+                <a href="/Home/New?tag=20-10" class="filter-chip @(currentTag == "20-10" ? "active" : "")">
+                    🌸 Lễ 20/10
+                </a>
+                <a href="/Home/New?tag=Birthday" class="filter-chip @(currentTag == "Birthday" ? "active" : "")">
+                    🎂 Sinh nhật
+                </a>
+                <a href="/Home/New?tag=Opening" class="filter-chip @(currentTag == "Opening" ? "active" : "")">
+                    🎊 Khai trương
+                </a>
+            </div>
+
+            <form method="get" action="/Home/New" class="search-box">
+                @if (!string.IsNullOrEmpty(currentTag))
+                {
+                    <input type="hidden" name="tag" value="@currentTag" />
+                }
+                @if (!string.IsNullOrEmpty(currentCategory))
+                {
+                    <input type="hidden" name="category" value="@currentCategory" />
+                }
+                <span>⌕</span>
+                <input name="search" type="search" value="@currentSearch" placeholder="Tìm hoa theo tên..." aria-label="Tìm hoa" />
+            </form>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <p style="font-size:1.1rem;color:var(--muted);margin-bottom:1rem;">
+                    Không tìm thấy mẫu hoa nào khớp với lựa chọn hiện tại.
+                </p>
+                <a href="/Home/New" class="btn btn-petal">Xem toàn bộ mẫu hoa ↗</a>
+            </div>
+        }
+        else
+        {
+            <div id="product-grid" class="product-grid" aria-live="polite">
+                @foreach (var p in Model)
+                {
+                    @await Html.PartialAsync("_ProductCard", p)
+                }
+            </div>
+        }
+
+        <!-- Bottom CTA -->
+        <div class="mt-5 p-4 text-center" style="background:var(--cream);border:1px dashed var(--leaf);">
+            <h3 style="font-size:1.4rem;margin-bottom:.5rem;">Bạn muốn một mẫu cắm theo ý tưởng riêng?</h3>
+            <p style="font-size:.82rem;color:var(--muted);max-width:540px;margin:0 auto 1.2rem;">
+                Liên hệ trực tiếp với các Florist của Lá & Nụ qua Hotline/Zalo để được tư vấn thiết kế và phối màu theo sở thích.
+            </p>
+            <a href="https://zalo.me/0909999888" target="_blank" class="btn btn-petal">
+                Nhắn Zalo tư vấn riêng: 0909 999 888 ↗
+            </a>
+        </div>
+    </div>
+</section>
