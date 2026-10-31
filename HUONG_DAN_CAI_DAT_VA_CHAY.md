@@ -1,7 +1,7 @@
 # Nhóm 7 — Đề tài 22: Quản lý cửa hàng hoa tươi
 
 - Thành viên: Thành, Vinh, Vọng.
-- Giảng viên hướng dẫn: Trần Việt Hùng.
+- Giảng viên hướng dẫn: Trần Văn Hùng.
 - Website: Lá & Nụ — Fresh Flower Studio.
 - ASP.NET Core MVC 8, EF Core 8, ASP.NET Identity, SQLite.
 
